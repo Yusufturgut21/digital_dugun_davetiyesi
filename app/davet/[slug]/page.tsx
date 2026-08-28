@@ -36,6 +36,7 @@ export default function DavetPage() {
   const [mainVisible, setMainVisible] = useState(false);
 
   useEffect(() => {
+    if (!slug) return;
     getInvitationBySlug(slug).then(inv => {
       setInvitation(inv ?? null);
       if (inv) {
