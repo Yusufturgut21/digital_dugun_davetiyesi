@@ -15,8 +15,7 @@ export default function NewInvitationPage() {
 
   const handleSubmit = async (data: CreateInvitationInput) => {
     setLoading(true);
-    await new Promise(r => setTimeout(r, 400)); // small UX delay
-    const inv = createInvitation(data);
+    const inv = await createInvitation(data);
     setLoading(false);
     setCreated(inv);
   };

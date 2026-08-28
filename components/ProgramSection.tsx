@@ -1,16 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
+import { WeddingInvitation } from "@/lib/types";
+import { DEFAULT_PROGRAM_ITEMS } from "@/lib/defaults";
 
-const program = [
-  { time: "14:30", title: "Kapı Açılışı", desc: "Konukların karşılanması ve yerleşimi", icon: "◇" },
-  { time: "15:00", title: "Nikah Töreni", desc: "Resmi nikah ve yüzük takma", icon: "♡" },
-  { time: "16:30", title: "Kokteyl & Fotoğraf", desc: "Karşılıklı kadeh kaldırma ve anı fotoğrafları", icon: "◈" },
-  { time: "18:00", title: "Akşam Yemeği", desc: "Özel menü ile birlikte sofra zevki", icon: "✦" },
-  { time: "20:00", title: "Düğün Pastası", desc: "İlk dilim kesme ve kutlama", icon: "❋" },
-  { time: "20:30", title: "Müzik & Eğlence", desc: "Canlı müzik ve dans keyfi", icon: "◇" },
-];
+interface Props { invitation?: WeddingInvitation; }
 
-export default function ProgramSection() {
+export default function ProgramSection({ invitation }: Props) {
+  const program = invitation?.programItems?.length ? invitation.programItems : DEFAULT_PROGRAM_ITEMS;
   return (
     <section id="program" className="section-gap relative">
       <div

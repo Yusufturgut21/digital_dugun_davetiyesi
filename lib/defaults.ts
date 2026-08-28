@@ -17,6 +17,22 @@ export const DEFAULT_STORY_ITEMS = [
   { year: "2025", title: "Düğün", desc: "Ve şimdi, en güzel adımı birlikte atıyoruz.", icon: "♡", side: "right" as const, highlight: true },
 ];
 
+export const DEFAULT_FAQ_ITEMS = [
+  { q: "Çocuklar davetli mi?", a: "Düğünümüz yetişkinlere özel bir kutlama olarak planlanmıştır. Küçük misafirlerimizin olmamasını rica ediyoruz." },
+  { q: "Otopark mevcut mu?", a: "Mekan bünyesinde kapalı otopark bulunmaktadır. Ücretsiz olarak hizmet vermektedir." },
+  { q: "Konaklama önerisi var mı?", a: "Mekanın çevresinde birçok butik otel mevcuttur. Özel fiyatlar için bizimle iletişime geçebilirsiniz." },
+  { q: "Düğün programı ne zaman başlıyor?", a: "Kapılar 30 dk önce açılacak, tören belirtilen saatte başlayacaktır." },
+];
+
+export const DEFAULT_PROGRAM_ITEMS = [
+  { time: "14:30", title: "Kapı Açılışı", desc: "Konukların karşılanması ve yerleşimi", icon: "◇" },
+  { time: "15:00", title: "Nikah Töreni", desc: "Resmi nikah ve yüzük takma", icon: "♡" },
+  { time: "16:30", title: "Kokteyl & Fotoğraf", desc: "Kadeh kaldırma ve anı fotoğrafları", icon: "◈" },
+  { time: "18:00", title: "Akşam Yemeği", desc: "Özel menü ile birlikte sofra zevki", icon: "✦" },
+  { time: "20:00", title: "Düğün Pastası", desc: "İlk dilim kesme ve kutlama", icon: "❋" },
+  { time: "20:30", title: "Müzik & Eğlence", desc: "Canlı müzik ve dans keyfi", icon: "◇" },
+];
+
 export const EMPTY_INVITATION: Omit<CreateInvitationInput, "brideName" | "groomName"> = {
   brideSurname: "",
   groomSurname: "",
@@ -42,6 +58,8 @@ export const EMPTY_INVITATION: Omit<CreateInvitationInput, "brideName" | "groomN
   soundEnabled: true,
   soundVolume: 50,
   storyItems: DEFAULT_STORY_ITEMS,
+  faqItems: DEFAULT_FAQ_ITEMS,
+  programItems: DEFAULT_PROGRAM_ITEMS,
   theme: "cream-gold",
   isActive: true,
 };

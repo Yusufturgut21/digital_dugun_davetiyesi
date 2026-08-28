@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { CreateInvitationInput, WeddingInvitation, SealType, InvitationDesign, Theme, ConjunctionType, StoryItem } from "@/lib/types";
-import { PRESET_INVITATION_TEXTS, EMPTY_INVITATION, DEFAULT_STORY_ITEMS } from "@/lib/defaults";
+import { CreateInvitationInput, WeddingInvitation, SealType, InvitationDesign, Theme, ConjunctionType, StoryItem, FAQItem, ProgramItem } from "@/lib/types";
+import { PRESET_INVITATION_TEXTS, EMPTY_INVITATION, DEFAULT_STORY_ITEMS, DEFAULT_FAQ_ITEMS, DEFAULT_PROGRAM_ITEMS } from "@/lib/defaults";
 
 type FormData = Omit<CreateInvitationInput, "galleryImages"> & { galleryImages: string[] };
 
@@ -23,6 +23,8 @@ const STEPS = [
   "Fotoğraflar",
   "Ses Ayarları",
   "Tema",
+  "Program",
+  "SSS",
 ];
 
 const inputCls = `w-full px-4 py-3 rounded-xl font-sans text-sm outline-none transition-all`;
@@ -447,6 +449,119 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading }
             </button>
           ))}
         </div>
+      </div>
+    </div>,
+
+    // Step 9 — Program
+    <div key="9" className={sectionCls}>
+      <div className="flex items-center justify-between mb-2">
+        <Label>Düğün Programı</Label>
+        <button
+          type="button"
+          onClick={() => set("programItems", [...(form.programItems ?? []), { time: "", title: "", desc: "", icon: "◇" }])}
+          className="text-xs px-3 py-1.5 rounded-lg"
+          style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
+        >
+          + Ekle
+        </button>
+      </div>
+      <div className="space-y-3">
+        {(form.programItems ?? DEFAULT_PROGRAM_ITEMS).map((item: ProgramItem, idx: number) => (
+          <div key={idx} className="rounded-xl p-4 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.1)" }}>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Saat</label>
+                <Input value={item.time} onChange={v => {
+                  const items = [...(form.programItems ?? DEFAULT_PROGRAM_ITEMS)];
+                  items[idx] = { ...items[idx], time: v };
+                  set("programItems", items);
+                }} placeholder="15:00" />
+              </div>
+              <div>
+                <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>İkon</label>
+                <Input value={item.icon} onChange={v => {
+                  const items = [...(form.programItems ?? DEFAULT_PROGRAM_ITEMS)];
+                  items[idx] = { ...items[idx], icon: v };
+                  set("programItems", items);
+                }} placeholder="◇" />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Başlık</label>
+              <Input value={item.title} onChange={v => {
+                const items = [...(form.programItems ?? DEFAULT_PROGRAM_ITEMS)];
+                items[idx] = { ...items[idx], title: v };
+                set("programItems", items);
+              }} placeholder="Nikah Töreni" />
+            </div>
+            <div>
+              <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Açıklama</label>
+              <Input value={item.desc} onChange={v => {
+                const items = [...(form.programItems ?? DEFAULT_PROGRAM_ITEMS)];
+                items[idx] = { ...items[idx], desc: v };
+                set("programItems", items);
+              }} placeholder="Kısa açıklama" />
+            </div>
+            <button
+              type="button"
+              onClick={() => set("programItems", (form.programItems ?? DEFAULT_PROGRAM_ITEMS).filter((_: ProgramItem, i: number) => i !== idx))}
+              className="text-xs" style={{ color: "#f87171" }}
+            >
+              Sil
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>,
+
+    // Step 10 — SSS (FAQ)
+    <div key="10" className={sectionCls}>
+      <div className="flex items-center justify-between mb-2">
+        <Label>Sık Sorulan Sorular</Label>
+        <button
+          type="button"
+          onClick={() => set("faqItems", [...(form.faqItems ?? []), { q: "", a: "" }])}
+          className="text-xs px-3 py-1.5 rounded-lg"
+          style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
+        >
+          + Ekle
+        </button>
+      </div>
+      <div className="space-y-3">
+        {(form.faqItems ?? DEFAULT_FAQ_ITEMS).map((item: FAQItem, idx: number) => (
+          <div key={idx} className="rounded-xl p-4 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.1)" }}>
+            <div>
+              <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Soru</label>
+              <Input value={item.q} onChange={v => {
+                const items = [...(form.faqItems ?? DEFAULT_FAQ_ITEMS)];
+                items[idx] = { ...items[idx], q: v };
+                set("faqItems", items);
+              }} placeholder="Çocuklar davetli mi?" />
+            </div>
+            <div>
+              <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Cevap</label>
+              <textarea
+                rows={2}
+                value={item.a}
+                onChange={e => {
+                  const items = [...(form.faqItems ?? DEFAULT_FAQ_ITEMS)];
+                  items[idx] = { ...items[idx], a: e.target.value };
+                  set("faqItems", items);
+                }}
+                className="w-full px-4 py-2 rounded-xl font-sans text-sm outline-none transition-all resize-none"
+                style={inputStyle}
+                placeholder="Cevabınızı yazın..."
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => set("faqItems", (form.faqItems ?? DEFAULT_FAQ_ITEMS).filter((_: FAQItem, i: number) => i !== idx))}
+              className="text-xs" style={{ color: "#f87171" }}
+            >
+              Sil
+            </button>
+          </div>
+        ))}
       </div>
     </div>,
   ];

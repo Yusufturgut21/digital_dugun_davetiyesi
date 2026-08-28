@@ -16,15 +16,15 @@ export default function EditInvitationPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const inv = getInvitationById(id);
-    if (!inv) setNotFound(true);
-    else setInvitation(inv);
+    getInvitationById(id).then(inv => {
+      if (!inv) setNotFound(true);
+      else setInvitation(inv);
+    });
   }, [id]);
 
   const handleSubmit = async (data: CreateInvitationInput) => {
     setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
-    updateInvitation(id, data);
+    await updateInvitation(id, data);
     setLoading(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);

@@ -31,19 +31,22 @@ export default function AdminPage() {
   const [qrTarget, setQrTarget] = useState<WeddingInvitation | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  const load = () => setInvitations(getAllInvitations().sort((a, b) =>
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  ));
+  const load = async () => {
+    const data = await getAllInvitations();
+    setInvitations(data.sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ));
+  };
 
   useEffect(() => { load(); }, []);
 
-  const handleToggle = (id: string) => {
-    toggleInvitationStatus(id);
+  const handleToggle = async (id: string) => {
+    await toggleInvitationStatus(id);
     load();
   };
 
-  const handleDelete = (id: string) => {
-    deleteInvitation(id);
+  const handleDelete = async (id: string) => {
+    await deleteInvitation(id);
     setConfirmDelete(null);
     load();
   };

@@ -12,6 +12,18 @@ export interface StoryItem {
   highlight?: boolean;
 }
 
+export interface FAQItem {
+  q: string;
+  a: string;
+}
+
+export interface ProgramItem {
+  time: string;
+  title: string;
+  desc: string;
+  icon: string;
+}
+
 export interface WeddingInvitation {
   id: string;
   slug: string;
@@ -64,6 +76,12 @@ export interface WeddingInvitation {
 
   // Hikaye
   storyItems: StoryItem[];
+
+  // FAQ
+  faqItems: FAQItem[];
+
+  // Program
+  programItems: ProgramItem[];
 
   // Tema
   theme: Theme;

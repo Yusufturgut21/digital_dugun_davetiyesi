@@ -1,27 +1,13 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { WeddingInvitation } from "@/lib/types";
+import { DEFAULT_FAQ_ITEMS } from "@/lib/defaults";
 
-const faqs = [
-  {
-    q: "Çocuklar davetli mi?",
-    a: "Düğünümüz yetişkinlere özel bir kutlama olarak planlanmıştır. Küçük misafirlerimizin olmamasını rica ediyoruz.",
-  },
-  {
-    q: "Otopark mevcut mu?",
-    a: "Mekan bünyesinde 200 araçlık kapalı otopark bulunmaktadır. Ücretsiz olarak hizmet vermektedir.",
-  },
-  {
-    q: "Konaklama önerisi var mı?",
-    a: "Mekanın çevresinde birçok butik otel mevcuttur. Misafirlerimiz için özel fiyatlar konusunda bizimle iletişime geçebilirsiniz.",
-  },
-  {
-    q: "Düğün programı ne zaman başlıyor?",
-    a: "Kapılar 14:30'da açılacak, nikah töreni 15:00'te başlayacaktır. Zamanında gelmenizi rica ederiz.",
-  },
-];
+interface Props { invitation?: WeddingInvitation; }
 
-export default function FAQSection() {
+export default function FAQSection({ invitation }: Props) {
+  const faqs = invitation?.faqItems?.length ? invitation.faqItems : DEFAULT_FAQ_ITEMS;
   const [open, setOpen] = useState<number | null>(null);
 
   return (
