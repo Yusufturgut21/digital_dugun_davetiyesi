@@ -1,86 +1,52 @@
 import { WeddingInvitation, CreateInvitationInput } from "./types";
 
-const STORAGE_KEY = "wedding_invitations";
+const base = () =>
+  typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
 
-function generateId(): string {
-  return Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
+export async function getAllInvitations(): Promise<WeddingInvitation[]> {
+  const res = await fetch(`${base()}/api/invitations`, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json();
 }
 
-function generateSlug(brideName: string, groomName: string, existingSlugs: string[]): string {
-  const base = `${groomName}-${brideName}`
-    .toLowerCase()
-    .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s")
-    .replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c")
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  const year = new Date().getFullYear();
-  let slug = base;
-  let counter = 1;
-  while (existingSlugs.includes(slug)) {
-    slug = counter === 1 ? `${base}-${year}` : `${base}-${year}-${counter}`;
-    counter++;
-  }
-  return slug;
+export async function getInvitationById(id: string): Promise<WeddingInvitation | null> {
+  const res = await fetch(`${base()}/api/invitations/${id}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return res.json();
 }
 
-export function getAllInvitations(): WeddingInvitation[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+export async function getInvitationBySlug(slug: string): Promise<WeddingInvitation | null> {
+  const res = await fetch(`${base()}/api/invitations?slug=${encodeURIComponent(slug)}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return res.json();
 }
 
-export function getInvitationById(id: string): WeddingInvitation | null {
-  return getAllInvitations().find(i => i.id === id) ?? null;
+export async function createInvitation(input: CreateInvitationInput): Promise<WeddingInvitation> {
+  const res = await fetch(`${base()}/api/invitations`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return res.json();
 }
 
-export function getInvitationBySlug(slug: string): WeddingInvitation | null {
-  return getAllInvitations().find(i => i.slug === slug) ?? null;
+export async function updateInvitation(id: string, updates: Partial<WeddingInvitation>): Promise<WeddingInvitation | null> {
+  const res = await fetch(`${base()}/api/invitations/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
-export function createInvitation(input: CreateInvitationInput): WeddingInvitation {
-  const all = getAllInvitations();
-  const slugs = all.map(i => i.slug);
-  const now = new Date().toISOString();
-
-  const invitation: WeddingInvitation = {
-    ...input,
-    id: generateId(),
-    slug: generateSlug(input.brideName, input.groomName, slugs),
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...all, invitation]));
-  return invitation;
+export async function deleteInvitation(id: string): Promise<boolean> {
+  const res = await fetch(`${base()}/api/invitations/${id}`, { method: "DELETE" });
+  return res.ok;
 }
 
-export function updateInvitation(id: string, updates: Partial<WeddingInvitation>): WeddingInvitation | null {
-  const all = getAllInvitations();
-  const idx = all.findIndex(i => i.id === id);
-  if (idx === -1) return null;
-
-  const updated = { ...all[idx], ...updates, updatedAt: new Date().toISOString() };
-  all[idx] = updated;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  return updated;
-}
-
-export function deleteInvitation(id: string): boolean {
-  const all = getAllInvitations();
-  const filtered = all.filter(i => i.id !== id);
-  if (filtered.length === all.length) return false;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-  return true;
-}
-
-export function toggleInvitationStatus(id: string): WeddingInvitation | null {
-  const inv = getInvitationById(id);
+export async function toggleInvitationStatus(id: string): Promise<WeddingInvitation | null> {
+  const inv = await getInvitationById(id);
   if (!inv) return null;
   return updateInvitation(id, { isActive: !inv.isActive });
 }
