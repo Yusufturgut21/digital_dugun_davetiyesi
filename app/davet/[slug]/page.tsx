@@ -36,17 +36,36 @@ export default function DavetPage() {
   const [mainVisible, setMainVisible] = useState(false);
 
   useEffect(() => {
-    const inv = getInvitationBySlug(slug);
-    setInvitation(inv ?? null);
-
-    if (inv) {
-      const seen = localStorage.getItem(`wedding_seen_${inv.id}`);
-      if (seen) {
-        setShowEnvelope(false);
-        setMainVisible(true);
+    getInvitationBySlug(slug).then(inv => {
+      setInvitation(inv ?? null);
+      if (inv) {
+        const seen = localStorage.getItem(`wedding_seen_${inv.id}`);
+        const hasHash = typeof window !== "undefined" && window.location.hash.length > 1;
+        if (seen || hasHash) {
+          setShowEnvelope(false);
+          setMainVisible(true);
+        }
       }
-    }
+    });
   }, [slug]);
+
+  // Hash ile gelinirse, içerik render olduktan sonra ilgili bölüme scroll et
+  useEffect(() => {
+    if (!mainVisible) return;
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    if (hash && hash.length > 1) {
+      const id = hash.replace("#", "");
+      const tryScroll = (attempts = 0) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else if (attempts < 10) {
+          setTimeout(() => tryScroll(attempts + 1), 200);
+        }
+      };
+      setTimeout(() => tryScroll(), 300);
+    }
+  }, [mainVisible]);
 
   const handleEnvelopeComplete = () => {
     if (invitation) {
@@ -111,13 +130,13 @@ export default function DavetPage() {
             <MapSection invitation={invitation} />
           </Suspense>
           <Suspense fallback={<SectionSkeleton />}>
-            <ProgramSection />
+            <ProgramSection invitation={invitation} />
           </Suspense>
           <Suspense fallback={<SectionSkeleton />}>
             <RSVPSection invitation={invitation} />
           </Suspense>
           <Suspense fallback={<SectionSkeleton />}>
-            <FAQSection />
+            <FAQSection invitation={invitation} />
           </Suspense>
           <Suspense fallback={<SectionSkeleton />}>
             <SocialSection />
