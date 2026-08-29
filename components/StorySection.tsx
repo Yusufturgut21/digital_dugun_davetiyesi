@@ -87,7 +87,18 @@ function TimelineItem({ item, i }: { item: StoryItem; i: number }) {
 }
 
 export default function StorySection({ invitation }: Props) {
-  const items = (invitation?.storyItems?.length ? invitation.storyItems : story) as StoryItem[];
+  const rawItems = (invitation?.storyItems?.length ? invitation.storyItems : story) as StoryItem[];
+
+  // Admin'in girdiği weddingDate varsa, highlight (Düğün) öğesinin yılını otomatik güncelle
+  const weddingYear = invitation?.weddingDate
+    ? new Date(invitation.weddingDate).getFullYear().toString()
+    : null;
+
+  const items = weddingYear
+    ? rawItems.map((item) =>
+      item.highlight ? { ...item, year: weddingYear } : item
+    )
+    : rawItems;
   return (
     <section id="story" className="section-gap relative overflow-hidden">
       <div

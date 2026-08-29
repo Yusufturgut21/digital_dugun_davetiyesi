@@ -14,7 +14,7 @@ export const DEFAULT_STORY_ITEMS = [
   { year: "2022", title: "İlk Tanışma", desc: "Ortak bir arkadaşın davetinde gözlerimiz ilk kez buluştu.", icon: "✦", side: "left" as const },
   { year: "2023", title: "Söz", desc: "Ailelerimizin huzurunda söz verdik.", icon: "❋", side: "right" as const },
   { year: "2024", title: "Nişan", desc: "Nişan törenimizde halkalarımızı taktık.", icon: "◈", side: "left" as const },
-  { year: "2025", title: "Düğün", desc: "Ve şimdi, en güzel adımı birlikte atıyoruz.", icon: "♡", side: "right" as const, highlight: true },
+  { year: "2026", title: "Düğün", desc: "Ve şimdi, en güzel adımı birlikte atıyoruz.", icon: "♡", side: "right" as const, highlight: true },
 ];
 
 export const DEFAULT_FAQ_ITEMS = [
