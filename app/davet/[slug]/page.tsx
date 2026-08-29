@@ -40,9 +40,8 @@ export default function DavetPage() {
     getInvitationBySlug(slug).then(inv => {
       setInvitation(inv ?? null);
       if (inv) {
-        const seen = localStorage.getItem(`wedding_seen_${inv.id}`);
         const hasHash = typeof window !== "undefined" && window.location.hash.length > 1;
-        if (seen || hasHash) {
+        if (hasHash) {
           setShowEnvelope(false);
           setMainVisible(true);
         }
@@ -69,9 +68,6 @@ export default function DavetPage() {
   }, [mainVisible]);
 
   const handleEnvelopeComplete = () => {
-    if (invitation) {
-      localStorage.setItem(`wedding_seen_${invitation.id}`, "1");
-    }
     setShowEnvelope(false);
     setTimeout(() => setMainVisible(true), 100);
   };
