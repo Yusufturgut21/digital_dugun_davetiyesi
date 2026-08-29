@@ -75,7 +75,13 @@ export interface WeddingInvitation {
   soundVolume: number; // 0-100
 
   // Hikaye
+  storySectionSubtitle?: string;
+  storySectionTitle?: string;
   storyItems: StoryItem[];
+
+  // Galeri başlıkları
+  gallerySectionSubtitle?: string;
+  gallerySectionTitle?: string;
 
   // FAQ
   faqItems: FAQItem[];

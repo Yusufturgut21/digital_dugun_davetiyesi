@@ -25,6 +25,7 @@ const STEPS = [
   "Tema",
   "Program",
   "SSS",
+  "Hikayemiz",
 ];
 
 const inputCls = `w-full px-4 py-3 rounded-xl font-sans text-sm outline-none transition-all`;
@@ -356,9 +357,9 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading }
 
     // Step 6 — Fotoğraflar
     <div key="6" className={sectionCls}>
-      <ImageUpload value={form.coverImage ?? ""} onChange={v => set("coverImage", v)} label="Kapak Fotoğrafı" />
+      <ImageUpload value={form.coverImage ?? ""} onChange={v => set("coverImage", v)} label="Kapak Fotoğrafı (Giriş manzarası olarak kullanılır)" />
       <div>
-        <Label>Galeri Fotoğrafları</Label>
+        <Label>Galeri Fotoğrafları {form.galleryImages.length > 0 && `(${form.galleryImages.length})`}</Label>
         <div
           className="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer"
           style={{ borderColor: "rgba(201,168,76,0.25)", background: "rgba(255,255,255,0.02)" }}
@@ -371,21 +372,63 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading }
         </div>
         <input ref={galleryRef} type="file" accept="image/*" multiple className="hidden" onChange={addGalleryImage} />
         {form.galleryImages.length > 0 && (
-          <div className="grid grid-cols-3 gap-2 mt-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
             {form.galleryImages.map((img, idx) => (
-              <div key={idx} className="relative">
+              <div key={idx} className="relative group">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img} alt="" className="w-full h-24 object-cover rounded-lg" />
-                <button
-                  type="button"
-                  onClick={() => removeGallery(idx)}
-                  className="absolute top-1 right-1 w-5 h-5 rounded-full text-xs flex items-center justify-center"
-                  style={{ background: "rgba(239,68,68,0.8)", color: "white" }}
-                >×</button>
+                <img src={img} alt="" className="w-full h-28 object-cover rounded-lg" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1">
+                  {idx > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const imgs = [...form.galleryImages];
+                        [imgs[idx - 1], imgs[idx]] = [imgs[idx], imgs[idx - 1]];
+                        set("galleryImages", imgs);
+                      }}
+                      className="w-7 h-7 rounded-full text-xs flex items-center justify-center"
+                      style={{ background: "rgba(201,168,76,0.8)", color: "white" }}
+                    >←</button>
+                  )}
+                  {idx < form.galleryImages.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const imgs = [...form.galleryImages];
+                        [imgs[idx], imgs[idx + 1]] = [imgs[idx + 1], imgs[idx]];
+                        set("galleryImages", imgs);
+                      }}
+                      className="w-7 h-7 rounded-full text-xs flex items-center justify-center"
+                      style={{ background: "rgba(201,168,76,0.8)", color: "white" }}
+                    >→</button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeGallery(idx)}
+                    className="w-7 h-7 rounded-full text-xs flex items-center justify-center"
+                    style={{ background: "rgba(239,68,68,0.8)", color: "white" }}
+                  >×</button>
+                </div>
+                {idx === 0 && (
+                  <span className="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 rounded"
+                    style={{ background: "rgba(201,168,76,0.8)", color: "white" }}>
+                    Öne çıkan
+                  </span>
+                )}
               </div>
             ))}
           </div>
         )}
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label>Galeri Alt Başlık</Label>
+          <Input value={form.gallerySectionSubtitle ?? "Anılar"} onChange={v => set("gallerySectionSubtitle", v)} placeholder="Anılar" />
+        </div>
+        <div>
+          <Label>Galeri Başlık</Label>
+          <Input value={form.gallerySectionTitle ?? "Fotoğraf Galerisi"} onChange={v => set("gallerySectionTitle", v)} placeholder="Fotoğraf Galerisi" />
+        </div>
       </div>
     </div>,
 
@@ -556,6 +599,142 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading }
             <button
               type="button"
               onClick={() => set("faqItems", (form.faqItems ?? DEFAULT_FAQ_ITEMS).filter((_: FAQItem, i: number) => i !== idx))}
+              className="text-xs" style={{ color: "#f87171" }}
+            >
+              Sil
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>,
+
+    // Step 11 — Hikayemiz
+    <div key="11" className={sectionCls}>
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <Label>Bölüm Alt Başlık</Label>
+          <Input value={form.storySectionSubtitle ?? "Bizim"} onChange={v => set("storySectionSubtitle", v)} placeholder="Bizim" />
+        </div>
+        <div>
+          <Label>Bölüm Başlık</Label>
+          <Input value={form.storySectionTitle ?? "Hikayemiz"} onChange={v => set("storySectionTitle", v)} placeholder="Hikayemiz" />
+        </div>
+      </div>
+      <div className="flex items-center justify-between mb-2">
+        <Label>Hikaye Zaman Tüneli</Label>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => set("storyItems", DEFAULT_STORY_ITEMS)}
+            className="text-xs px-3 py-1.5 rounded-lg"
+            style={{ background: "rgba(255,255,255,0.04)", color: "rgba(201,168,76,0.6)", border: "1px solid rgba(201,168,76,0.15)" }}
+          >
+            Varsayılana Dön
+          </button>
+          <button
+            type="button"
+            onClick={() => set("storyItems", [...(form.storyItems ?? DEFAULT_STORY_ITEMS), { year: new Date().getFullYear().toString(), title: "", desc: "", icon: "✦", side: "left" as const }])}
+            className="text-xs px-3 py-1.5 rounded-lg"
+            style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
+          >
+            + Ekle
+          </button>
+        </div>
+      </div>
+      <p className="text-xs mb-4" style={{ color: "rgba(201,168,76,0.45)" }}>
+        Her bir kartı düzenleyin. ♡ Düğün olarak işaretlediğiniz öğenin yılı, girdiğiniz düğün tarihinden otomatik alınır.
+      </p>
+      <div className="space-y-3">
+        {(form.storyItems ?? DEFAULT_STORY_ITEMS).map((item: StoryItem, idx: number) => (
+          <div key={idx} className="rounded-xl p-4 space-y-3" style={{ background: item.highlight ? "rgba(201,168,76,0.07)" : "rgba(255,255,255,0.03)", border: `1px solid ${item.highlight ? "rgba(201,168,76,0.3)" : "rgba(201,168,76,0.1)"}` }}>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Yıl</label>
+                <Input value={item.year} onChange={v => {
+                  const items = [...(form.storyItems ?? DEFAULT_STORY_ITEMS)];
+                  items[idx] = { ...items[idx], year: v };
+                  set("storyItems", items);
+                }} placeholder="2024" />
+              </div>
+              <div>
+                <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>İkon</label>
+                <Input value={item.icon} onChange={v => {
+                  const items = [...(form.storyItems ?? DEFAULT_STORY_ITEMS)];
+                  items[idx] = { ...items[idx], icon: v };
+                  set("storyItems", items);
+                }} placeholder="✦" />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Başlık</label>
+              <Input value={item.title} onChange={v => {
+                const items = [...(form.storyItems ?? DEFAULT_STORY_ITEMS)];
+                items[idx] = { ...items[idx], title: v };
+                set("storyItems", items);
+              }} placeholder="İlk Tanışma" />
+            </div>
+            <div>
+              <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Açıklama</label>
+              <textarea
+                rows={2}
+                value={item.desc}
+                onChange={e => {
+                  const items = [...(form.storyItems ?? DEFAULT_STORY_ITEMS)];
+                  items[idx] = { ...items[idx], desc: e.target.value };
+                  set("storyItems", items);
+                }}
+                className="w-full px-4 py-2 rounded-xl font-sans text-sm outline-none transition-all resize-none"
+                style={inputStyle}
+                placeholder="Kısa hikaye açıklaması..."
+              />
+            </div>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div>
+                <label className="text-xs mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Konum</label>
+                <div className="flex gap-2">
+                  {(["left", "right"] as const).map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => {
+                        const items = [...(form.storyItems ?? DEFAULT_STORY_ITEMS)];
+                        items[idx] = { ...items[idx], side: s };
+                        set("storyItems", items);
+                      }}
+                      className="text-xs px-3 py-1.5 rounded-lg"
+                      style={{
+                        background: item.side === s ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.04)",
+                        border: `1px solid ${item.side === s ? "rgba(201,168,76,0.5)" : "rgba(201,168,76,0.12)"}`,
+                        color: item.side === s ? "#E8D5A3" : "rgba(255,255,255,0.4)",
+                      }}
+                    >
+                      {s === "left" ? "← Sol" : "Sağ →"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const items = [...(form.storyItems ?? DEFAULT_STORY_ITEMS)];
+                    items[idx] = { ...items[idx], highlight: !item.highlight };
+                    set("storyItems", items);
+                  }}
+                  className="w-5 h-5 rounded flex items-center justify-center text-xs"
+                  style={{
+                    background: item.highlight ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.06)",
+                    border: `1px solid ${item.highlight ? "rgba(201,168,76,0.6)" : "rgba(201,168,76,0.15)"}`,
+                  }}
+                >
+                  {item.highlight ? "♡" : ""}
+                </button>
+                <label className="text-xs" style={{ color: "rgba(201,168,76,0.6)" }}>Düğün (öne çıkan)</label>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => set("storyItems", (form.storyItems ?? DEFAULT_STORY_ITEMS).filter((_: StoryItem, i: number) => i !== idx))}
               className="text-xs" style={{ color: "#f87171" }}
             >
               Sil
