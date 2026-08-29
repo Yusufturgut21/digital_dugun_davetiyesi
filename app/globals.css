@@ -105,10 +105,130 @@ body {
 /* Section spacing */
 .section-gap { padding: 100px 0; }
 
-/* Curtain opening */
+/* Curtain opening — rich cinematic */
 .curtain-panel {
   will-change: transform;
+  perspective: 1200px;
 }
+.curtain-fabric-rich {
+  background: linear-gradient(
+    105deg,
+    #0d0503 0%,
+    #2a1208 8%,
+    #5C2818 20%,
+    #7A3820 35%,
+    #4A2010 50%,
+    #6B3020 65%,
+    #3A1808 80%,
+    #1a0804 92%,
+    #0d0503 100%
+  );
+  box-shadow: inset -20px 0 60px rgba(0,0,0,0.5), inset 20px 0 60px rgba(0,0,0,0.3);
+}
+.curtain-sheer {
+  background: linear-gradient(
+    90deg,
+    rgba(80,30,15,0.85) 0%,
+    rgba(120,50,25,0.7) 30%,
+    rgba(100,40,20,0.75) 70%,
+    rgba(60,25,12,0.85) 100%
+  );
+  opacity: 0.6;
+}
+.curtain-fringe {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 6px,
+    rgba(201,168,76,0.4) 6px,
+    rgba(201,168,76,0.4) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+  mask-image: linear-gradient(180deg, transparent, black 40%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 40%);
+}
+.curtain-folds-left {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 14px,
+    rgba(0,0,0,0.18) 14px,
+    rgba(0,0,0,0.18) 18px,
+    transparent 18px,
+    transparent 32px,
+    rgba(255,255,255,0.04) 32px,
+    rgba(255,255,255,0.04) 34px
+  );
+}
+.curtain-folds-right {
+  background: repeating-linear-gradient(
+    270deg,
+    transparent 0px,
+    transparent 14px,
+    rgba(0,0,0,0.18) 14px,
+    rgba(0,0,0,0.18) 18px,
+    transparent 18px,
+    transparent 32px,
+    rgba(255,255,255,0.04) 32px,
+    rgba(255,255,255,0.04) 34px
+  );
+}
+
+/* Valance */
+.valance-bar { overflow: visible; }
+.valance-swag {
+  width: 11%;
+  height: 28px;
+  background: linear-gradient(180deg, #3d2010, #6B3820);
+  border-radius: 0 0 50% 50%;
+  margin-top: -1px;
+  animation: swagSway 4s ease-in-out infinite;
+}
+.valance-tassel {
+  width: 3px;
+  height: 18px;
+  background: linear-gradient(180deg, #C9A84C, #7A5C1E);
+  border-radius: 0 0 2px 2px;
+  position: relative;
+}
+.valance-tassel::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: #C9A84C;
+  border-radius: 50%;
+}
+@keyframes swagSway {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.08); }
+}
+
+/* Shimmer text for invite names */
+.shimmer-text-invite {
+  background: linear-gradient(
+    90deg,
+    #fff 0%,
+    #F5E6B8 25%,
+    #fff 50%,
+    #E8D5A3 75%,
+    #fff 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: inviteShimmer 4s linear infinite;
+}
+@keyframes inviteShimmer {
+  to { background-position: 200% center; }
+}
+
+/* Legacy curtain (kept for compatibility) */
 .curtain-fabric {
   background: linear-gradient(
     90deg,
@@ -121,32 +241,6 @@ body {
     #1a0a05 100%
   );
   box-shadow: inset 0 0 60px rgba(0,0,0,0.4);
-}
-.curtain-folds-left {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 18px,
-    rgba(0,0,0,0.15) 18px,
-    rgba(0,0,0,0.15) 22px,
-    transparent 22px,
-    transparent 40px,
-    rgba(255,255,255,0.03) 40px,
-    rgba(255,255,255,0.03) 42px
-  );
-}
-.curtain-folds-right {
-  background: repeating-linear-gradient(
-    270deg,
-    transparent 0px,
-    transparent 18px,
-    rgba(0,0,0,0.15) 18px,
-    rgba(0,0,0,0.15) 22px,
-    transparent 22px,
-    transparent 40px,
-    rgba(255,255,255,0.03) 40px,
-    rgba(255,255,255,0.03) 42px
-  );
 }
 
 /* Envelope wax seal */
