@@ -19,11 +19,16 @@ export default function AdminGalleryPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        console.log("[AdminGallery] Fetching gallery data...");
         apiFetch<GalleryData>("/api/gallery")
             .then((res) => {
+                console.log("[AdminGallery] Loaded gallery:", res);
                 setData(res);
             })
-            .catch((err) => setError(err.message))
+            .catch((err) => {
+                console.error("[AdminGallery] Load error:", err);
+                setError(err.message);
+            })
             .finally(() => setLoading(false));
     }, []);
 

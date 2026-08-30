@@ -136,8 +136,18 @@ export default function WeddingGallerySection() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [lightbox, close, prev, next]);
 
-  // Sadece eklenen resimler varsa göster
-  if (loading || globalGallery.length === 0) return null;
+  // Loading state göster
+  if (loading) {
+    return (
+      <section className="section-gap flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+          style={{ borderColor: "rgba(201,168,76,0.4)", borderTopColor: "transparent" }} />
+      </section>
+    );
+  }
+
+  // Galeri boşsa hiç render etme
+  if (globalGallery.length === 0) return null;
 
   const subtitle = "DÜĞÜN GALERİSİ";
   const title = "Hayalinizdeki Güne Ev Sahipliği Yapıyoruz";
