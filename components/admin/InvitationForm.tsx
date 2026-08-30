@@ -628,12 +628,6 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
               </div>
               {form.theme === val && <span className="ml-auto text-yellow-400">✓</span>}
             </button>
-              <div className="w-10 h-10 rounded-lg flex-shrink-0" style={{ background: bg, border: `2px solid ${accent}` }} />
-              <span className="font-sans text-sm" style={{ color: form.theme === val ? "#E8D5A3" : "rgba(255,255,255,0.5)" }}>
-                {label}
-              </span>
-              {form.theme === val && <span className="ml-auto text-yellow-400">✓</span>}
-            </button>
           ))}
         </div>
       </div>
