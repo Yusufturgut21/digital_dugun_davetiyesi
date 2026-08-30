@@ -5,19 +5,14 @@ import Image from "next/image";
 import { WeddingInvitation } from "@/lib/types";
 import { isDataUrl } from "@/lib/imageUtils";
 
-const DEFAULT_PHOTOS = [
-  { id: 0, src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=85", alt: "Düğün", span: "col-span-2 row-span-2" as const, rotate: -1 },
-  { id: 1, src: "https://images.unsplash.com/photo-1529636444744-adffc9135a5e?w=600&q=85", alt: "Nişan", span: "col-span-1 row-span-1" as const, rotate: 2 },
-  { id: 2, src: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&q=85", alt: "Gelin", span: "col-span-1 row-span-1" as const, rotate: -2 },
-  { id: 3, src: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=85", alt: "Çiçekler", span: "col-span-1 row-span-1" as const, rotate: 1.5 },
-  { id: 4, src: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=85", alt: "Yüzükler", span: "col-span-1 row-span-1" as const, rotate: -1.5 },
-  { id: 5, src: "https://images.unsplash.com/photo-1550005809-91ad75fb315f?w=600&q=85", alt: "Pasta", span: "col-span-2 row-span-1" as const, rotate: 0.5 },
-  { id: 6, src: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=85", alt: "Düğün Salonu", span: "col-span-1 row-span-1" as const, rotate: 2 },
-  { id: 7, src: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=85", alt: "Buket", span: "col-span-1 row-span-1" as const, rotate: -2 },
-  { id: 8, src: "https://images.unsplash.com/photo-1524824267900-2b6d4f0d6293?w=600&q=85", alt: "Sevgililer", span: "col-span-1 row-span-1" as const, rotate: 1 },
-];
-
-type Photo = typeof DEFAULT_PHOTOS[0];
+// Removed DEFAULT_PHOTOS to avoid showing random pictures, it will only load real ones
+type Photo = {
+  id: number;
+  src: string;
+  alt: string;
+  span: string;
+  rotate: number;
+};
 
 const SPAN_PATTERN = [
   "col-span-2 row-span-2",
@@ -94,6 +89,7 @@ function LightboxNav({ onPrev, onNext, current, total }: { onPrev: () => void; o
 
 export default function WeddingGallerySection() {
   const [globalGallery, setGlobalGallery] = useState<{ id: string, url: string, order: number }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/gallery")
@@ -103,15 +99,14 @@ export default function WeddingGallerySection() {
           setGlobalGallery(data.images.sort((a: any, b: any) => a.order - b.order));
         }
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  // Sadece eklenen resimler varsa göster, yoksa varsayılan placeholder'ları göster
-  const hasGlobalPhotos = globalGallery.length > 0;
+  // Sadece eklenen resimler varsa göster
+  if (loading || globalGallery.length === 0) return null;
 
-  const photos: Photo[] = hasGlobalPhotos
-    ? buildPhotos(globalGallery.map(img => img.url))
-    : DEFAULT_PHOTOS;
+  const photos: Photo[] = buildPhotos(globalGallery.map(img => img.url));
 
   const subtitle = "DÜĞÜN GALERİSİ";
   const title = "Hayalinizdeki Güne Ev Sahipliği Yapıyoruz";
