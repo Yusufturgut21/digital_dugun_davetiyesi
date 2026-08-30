@@ -18,6 +18,19 @@ export default function RSVPSection({ invitation }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length === 0) return '';
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+    if (digits.length <= 9) return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+    return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9, 11)}`;
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setForm(f => ({ ...f, phone: formatPhone(value) }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!invitation?.slug) {
@@ -160,32 +173,51 @@ export default function RSVPSection({ invitation }: Props) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              {[
-                { id: "name", label: "Ad Soyad", type: "text", placeholder: "Adınızı giriniz", required: true },
-                { id: "phone", label: "Telefon", type: "tel", placeholder: "+90 5__ ___ __ __", required: true },
-              ].map(field => (
-                <div key={field.id}>
-                  <label className="block font-sans text-xs tracking-[0.2em] uppercase mb-2" style={{ color: "rgba(201,168,76,0.7)" }}>
-                    {field.label}
-                  </label>
-                  <input
-                    type={field.type}
-                    required={field.required}
-                    placeholder={field.placeholder}
-                    value={form[field.id as keyof FormState]}
-                    onChange={e => setForm(f => ({ ...f, [field.id]: e.target.value }))}
-                    className="w-full px-5 py-4 rounded-2xl font-sans text-sm font-light outline-none transition-all"
-                    style={{
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(201,168,76,0.2)",
-                      color: "rgba(255,255,255,0.85)",
-                      backdropFilter: "blur(10px)",
-                    }}
-                    onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.6)"}
-                    onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"}
-                  />
-                </div>
-              ))}
+              <div>
+                <label className="block font-sans text-xs tracking-[0.2em] uppercase mb-2" style={{ color: "rgba(201,168,76,0.7)" }}>
+                  Ad Soyad
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Adınızı giriniz"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  maxLength={60}
+                  className="w-full px-5 py-4 rounded-2xl font-sans text-sm font-light outline-none transition-all"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(201,168,76,0.2)",
+                    color: "rgba(255,255,255,0.85)",
+                    backdropFilter: "blur(10px)",
+                  }}
+                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.6)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"}
+                />
+              </div>
+
+              <div>
+                <label className="block font-sans text-xs tracking-[0.2em] uppercase mb-2" style={{ color: "rgba(201,168,76,0.7)" }}>
+                  Telefon
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="0555 123 45 67"
+                  value={form.phone}
+                  onChange={e => handlePhoneChange(e.target.value)}
+                  maxLength={14}
+                  className="w-full px-5 py-4 rounded-2xl font-sans text-sm font-light outline-none transition-all"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(201,168,76,0.2)",
+                    color: "rgba(255,255,255,0.85)",
+                    backdropFilter: "blur(10px)",
+                  }}
+                  onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.6)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"}
+                />
+              </div>
 
               <div>
                 <label className="block font-sans text-xs tracking-[0.2em] uppercase mb-2" style={{ color: "rgba(201,168,76,0.7)" }}>

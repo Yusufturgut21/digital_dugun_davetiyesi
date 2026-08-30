@@ -46,9 +46,9 @@ function Label({ children }: { children: React.ReactNode }) {
   return <label className={labelCls} style={labelStyle}>{children}</label>;
 }
 
-function Input({ value, onChange, type = "text", placeholder, required }: {
+function Input({ value, onChange, type = "text", placeholder, required, maxLength }: {
   value: string; onChange: (v: string) => void;
-  type?: string; placeholder?: string; required?: boolean;
+  type?: string; placeholder?: string; required?: boolean; maxLength?: number;
 }) {
   return (
     <input
@@ -57,6 +57,43 @@ function Input({ value, onChange, type = "text", placeholder, required }: {
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
       required={required}
+      maxLength={maxLength}
+      className={inputCls}
+      style={inputStyle}
+      onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.6)"}
+      onBlur={e => e.target.style.borderColor = "rgba(201,168,76,0.2)"}
+    />
+  );
+}
+
+function PhoneInput({ value, onChange, placeholder, required }: {
+  value: string; onChange: (v: string) => void;
+  placeholder?: string; required?: boolean;
+}) {
+  const formatPhone = (val: string) => {
+    // Sadece rakamları al
+    const digits = val.replace(/\D/g, '');
+    // Türk telefon formatı: 0555 123 45 67 (max 11 rakam, 0 ile başlamalı)
+    if (digits.length === 0) return '';
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+    if (digits.length <= 9) return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+    return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9, 11)}`;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    onChange(formatted);
+  };
+
+  return (
+    <input
+      type="tel"
+      value={value}
+      onChange={handleChange}
+      placeholder={placeholder}
+      required={required}
+      maxLength={14} // "0555 123 45 67" = 14 karakter
       className={inputCls}
       style={inputStyle}
       onFocus={e => e.target.style.borderColor = "rgba(201,168,76,0.6)"}
@@ -225,19 +262,19 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Gelin Adı *</Label>
-          <Input value={form.brideName} onChange={v => set("brideName", v)} placeholder="Ayşe" required />
+          <Input value={form.brideName} onChange={v => set("brideName", v)} placeholder="Ayşe" required maxLength={30} />
         </div>
         <div>
           <Label>Damat Adı *</Label>
-          <Input value={form.groomName} onChange={v => set("groomName", v)} placeholder="Mehmet" required />
+          <Input value={form.groomName} onChange={v => set("groomName", v)} placeholder="Mehmet" required maxLength={30} />
         </div>
         <div>
           <Label>Gelin Soyadı</Label>
-          <Input value={form.brideSurname ?? ""} onChange={v => set("brideSurname", v)} placeholder="Yılmaz" />
+          <Input value={form.brideSurname ?? ""} onChange={v => set("brideSurname", v)} placeholder="Yılmaz" maxLength={30} />
         </div>
         <div>
           <Label>Damat Soyadı</Label>
-          <Input value={form.groomSurname ?? ""} onChange={v => set("groomSurname", v)} placeholder="Kaya" />
+          <Input value={form.groomSurname ?? ""} onChange={v => set("groomSurname", v)} placeholder="Kaya" maxLength={30} />
         </div>
       </div>
       <div>
