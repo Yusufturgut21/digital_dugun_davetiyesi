@@ -70,6 +70,7 @@ export const EMPTY_INVITATION: Omit<CreateInvitationInput, "brideName" | "groomN
   faqItems: DEFAULT_FAQ_ITEMS,
   programItems: DEFAULT_PROGRAM_ITEMS,
   theme: "cream-gold",
+  socialHashtag: "",
   showStorySection: true,
   showGallerySection: true,
   showWeddingGallerySection: true,

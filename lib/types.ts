@@ -95,6 +95,9 @@ export interface WeddingInvitation {
   // Program
   programItems: ProgramItem[];
 
+  // Müşteri hashtag
+  socialHashtag?: string;
+
   // Tema
   theme: Theme;
 

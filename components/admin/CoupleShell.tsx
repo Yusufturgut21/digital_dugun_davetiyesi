@@ -55,7 +55,7 @@ export default function CoupleShell({ children }: { children: React.ReactNode })
     { href: `/panel/${panelSlug}/edit?step=7`, label: "Müzik", icon: "♪" },
     { href: `/panel/${panelSlug}/rsvp`, label: "RSVP / Katılım", icon: "✉" },
     { href: previewHref, label: "Davetiye Önizleme", icon: "👁", external: true },
-    { href: `/panel/${panelSlug}/account`, label: "Şifre Değiştir", icon: "🔒" },
+    { href: `/panel/${panelSlug}/account`, label: "Hesap Ayarları", icon: "⚙" },
   ];
 
   const isActive = (item: typeof nav[0]) => {

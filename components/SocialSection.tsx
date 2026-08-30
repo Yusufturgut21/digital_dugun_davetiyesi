@@ -1,6 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
 
+interface Props {
+  hashtag?: string;
+  groomName?: string;
+  brideName?: string;
+}
+
 const socials = [
   {
     name: "Instagram",
@@ -38,7 +44,13 @@ const socials = [
   },
 ];
 
-export default function SocialSection() {
+export default function SocialSection({ hashtag, groomName, brideName }: Props) {
+  // Eğer custom hashtag yoksa, isimlere göre oluştur
+  const displayHashtag = hashtag || 
+    (groomName && brideName 
+      ? `#${groomName}${brideName}${new Date().getFullYear()}`
+      : "#AyşeMehmet2026");
+
   return (
     <section id="social" className="section-gap relative">
       <div
@@ -107,7 +119,7 @@ export default function SocialSection() {
             Anılarınızı paylaşın
           </p>
           <p className="font-serif text-2xl sm:text-3xl" style={{ color: "#C9A84C" }}>
-            #AyşeMehmet2026
+            {displayHashtag}
           </p>
         </motion.div>
       </div>

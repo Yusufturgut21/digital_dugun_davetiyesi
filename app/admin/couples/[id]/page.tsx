@@ -70,18 +70,24 @@ export default function EditCouplePage() {
         </div>
       </div>
 
-      <div className="rounded-2xl p-4 grid sm:grid-cols-2 gap-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
+      <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
         <div>
           <label className="font-sans text-xs tracking-widest uppercase mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Kullanıcı Adı</label>
           <input value={username} onChange={(e) => setUsername(e.target.value)}
             className="w-full px-3 py-2 rounded-lg font-sans text-sm outline-none"
             style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "#E8D5A3" }} />
+          <p className="font-sans text-xs mt-2" style={{ color: "rgba(201,168,76,0.4)" }}>
+            Kullanıcı adı ve şifre değişikliklerini kaydetmek için sayfanın altındaki "Kaydet" butonuna tıklayın.
+          </p>
         </div>
-        <div>
+        <div className="mt-4">
           <label className="font-sans text-xs tracking-widest uppercase mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Yeni Şifre (opsiyonel)</label>
-          <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Değiştirmek için girin"
+          <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Değiştirmek istiyorsanız girin"
             className="w-full px-3 py-2 rounded-lg font-sans text-sm outline-none"
             style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "#E8D5A3" }} />
+          <p className="font-sans text-xs mt-1" style={{ color: "rgba(201,168,76,0.4)" }}>
+            Boş bırakırsanız mevcut şifre korunur.
+          </p>
         </div>
       </div>
 

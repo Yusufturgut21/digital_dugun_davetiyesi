@@ -3,9 +3,9 @@
  * Çift veya admin panelinden değiştirilemez.
  * Yalnızca geliştirici seviyesinde bu dosyadan güncellenir.
  */
-export const SAHRA_VENUE_NAME = "Sahra Balo Salonları";
-export const SAHRA_ADDRESS = "Küçükçekmece, İstanbul";
-export const SAHRA_DISTRICT = "Küçükçekmece";
+export const SAHRA_VENUE_NAME = "Sahra Düğün Davet ve Balo Salonları";
+export const SAHRA_ADDRESS = "Başakşehir, İstanbul";
+export const SAHRA_DISTRICT = "Başakşehir";
 export const SAHRA_CITY = "İstanbul";
 
 export const SAHRA_MAPS_URL =

@@ -898,6 +898,21 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
         <Toggle value={form.showFAQSection !== false} onChange={v => set("showFAQSection", v)} label="❓ Sık Sorulan Sorular" />
         <Toggle value={form.showSocialSection !== false} onChange={v => set("showSocialSection", v)} label="💬 İletişim" />
       </div>
+
+      {form.showSocialSection !== false && (
+        <div className="mt-6">
+          <Label>💬 Sosyal Medya Hashtag</Label>
+          <Input
+            value={form.socialHashtag || ""}
+            onChange={v => set("socialHashtag", v)}
+            placeholder={`Örn: #${form.groomName || "Damat"}${form.brideName || "Gelin"}${new Date().getFullYear()}`}
+            maxLength={50}
+          />
+          <p className="font-sans text-xs mt-2" style={{ color: "rgba(201,168,76,0.5)" }}>
+            Misafirlerinizin fotoğraflarını paylaşırken kullanacakları hashtag. Boş bırakırsanız isimlerinizden otomatik oluşturulur.
+          </p>
+        </div>
+      )}
     </div>,
   ];
 
@@ -940,12 +955,17 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
       </div>
 
       {/* Navigation */}
-      <div className="flex gap-3 pt-4 border-t" style={{ borderColor: "rgba(201,168,76,0.1)" }}>
+      <div className="flex gap-3 pt-6 border-t" style={{ borderColor: "rgba(201,168,76,0.15)" }}>
         {step > 0 && (
           <button
             type="button"
             onClick={() => setStep(s => s - 1)}
-            className="admin-btn admin-btn-outline"
+            className="px-5 py-3 rounded-xl font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1.5px solid rgba(201,168,76,0.3)",
+              color: "rgba(232,213,163,0.9)"
+            }}
           >
             ← Geri
           </button>
@@ -955,23 +975,39 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
           <button
             type="button"
             onClick={() => onPreview(form)}
-            className="admin-btn admin-btn-outline"
+            className="px-5 py-3 rounded-xl font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1.5px solid rgba(201,168,76,0.3)",
+              color: "rgba(232,213,163,0.9)"
+            }}
           >
-            Önizle
+            👁 Önizle
           </button>
         )}
         <button
           type="submit"
           disabled={loading}
-          className="admin-btn admin-btn-primary"
+          className="px-6 py-3 rounded-xl font-sans text-sm font-semibold transition-all hover:scale-105 active:scale-95 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+          style={{
+            background: "linear-gradient(135deg, #C9A84C 0%, #E8D5A3 100%)",
+            color: "#0f0a06",
+            border: "none",
+            boxShadow: "0 4px 15px rgba(201, 168, 76, 0.3)"
+          }}
         >
-          {loading ? "Kaydediliyor…" : "✓ Davetiyeyi Kaydet"}
+          {loading ? "⏳ Kaydediliyor…" : "✓ Davetiyeyi Kaydet"}
         </button>
         {step < STEPS.length - 1 && (
           <button
             type="button"
             onClick={() => setStep(s => s + 1)}
-            className="admin-btn admin-btn-primary"
+            className="px-5 py-3 rounded-xl font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(232,213,163,0.15))",
+              border: "1.5px solid rgba(201,168,76,0.4)",
+              color: "rgba(232,213,163,1)"
+            }}
           >
             İleri →
           </button>

@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { WeddingInvitation } from "@/lib/types";
 import { isDataUrl } from "@/lib/imageUtils";
 
 // Removed DEFAULT_PHOTOS to avoid showing random pictures, it will only load real ones
@@ -38,7 +37,6 @@ function buildPhotos(images: string[]): Photo[] {
   }));
 }
 
-interface Props { invitation?: WeddingInvitation; }
 
 function GalleryImage({ src, alt, className, priority }: { src: string; alt: string; className?: string; priority?: boolean }) {
   return (
@@ -101,9 +99,9 @@ export default function WeddingGallerySection() {
           console.log("[WeddingGallerySection] Setting gallery with", data.images.length, "images");
           setGlobalGallery(data.images.sort((a: any, b: any) => a.order - b.order));
         } else {
-          console.log("[WeddingGallerySection] No images to display:", { 
-            hasData: !!data, 
-            hasImages: !!(data?.images), 
+          console.log("[WeddingGallerySection] No images to display:", {
+            hasData: !!data,
+            hasImages: !!(data?.images),
             imageCount: data?.images?.length || 0
           });
         }
@@ -154,7 +152,7 @@ export default function WeddingGallerySection() {
   const currentPhoto = lightbox !== null ? photos[lightbox] : null;
 
   return (
-    <section id="gallery" className="section-gap relative overflow-hidden">
+    <section id="wedding-gallery" className="section-gap relative overflow-hidden">
       <div
         className="absolute inset-0"
         style={{ background: "linear-gradient(180deg, #FAF6F0 0%, #fff 50%, #FAF6F0 100%)" }}
