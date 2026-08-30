@@ -92,6 +92,17 @@ export interface WeddingInvitation {
   // Tema
   theme: Theme;
 
+  // Section Görünürlüğü
+  showStorySection?: boolean;
+  showGallerySection?: boolean;
+  showWeddingGallerySection?: boolean;
+  showDetailsSection?: boolean;
+  showMapSection?: boolean;
+  showProgramSection?: boolean;
+  showRSVPSection?: boolean;
+  showFAQSection?: boolean;
+  showSocialSection?: boolean;
+
   // Durum
   isActive: boolean;
   createdAt: string;

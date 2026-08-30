@@ -29,6 +29,7 @@ const STEPS = [
   "Program",
   "SSS",
   "Hikayemiz",
+  "Bölüm Görünürlüğü",
 ];
 
 const inputCls = `w-full px-4 py-3 rounded-xl font-sans text-sm outline-none transition-all`;
@@ -797,6 +798,24 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
             </button>
           </div>
         ))}
+      </div>
+    </div>,
+
+    // Step 12 — Bölüm Görünürlüğü
+    <div key="12" className={sectionCls}>
+      <p className="font-sans text-sm mb-4" style={{ color: "rgba(232,213,163,0.6)" }}>
+        Davetiye sayfanızda hangi bölümlerin görüneceğini seçin.
+      </p>
+      <div className="rounded-xl p-4 space-y-1" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.12)" }}>
+        <Toggle value={form.showStorySection !== false} onChange={v => set("showStorySection", v)} label="📖 Hikayemiz" />
+        <Toggle value={form.showGallerySection !== false} onChange={v => set("showGallerySection", v)} label="📷 Fotoğraf Galerisi (Çift)" />
+        <Toggle value={form.showWeddingGallerySection !== false} onChange={v => set("showWeddingGallerySection", v)} label="🏛️ Düğün Galerisi (Salon)" />
+        <Toggle value={form.showDetailsSection !== false} onChange={v => set("showDetailsSection", v)} label="📍 Detaylar" />
+        <Toggle value={form.showMapSection !== false} onChange={v => set("showMapSection", v)} label="🗺️ Harita" />
+        <Toggle value={form.showProgramSection !== false} onChange={v => set("showProgramSection", v)} label="📅 Program" />
+        <Toggle value={form.showRSVPSection !== false} onChange={v => set("showRSVPSection", v)} label="✅ Katılım" />
+        <Toggle value={form.showFAQSection !== false} onChange={v => set("showFAQSection", v)} label="❓ Sık Sorulan Sorular" />
+        <Toggle value={form.showSocialSection !== false} onChange={v => set("showSocialSection", v)} label="💬 İletişim" />
       </div>
     </div>,
   ];

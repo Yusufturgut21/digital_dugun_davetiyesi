@@ -115,33 +115,51 @@ export default function DavetPage() {
           <FloatingPetals />
           <MusicPlayer invitation={invitation} />
           <HeroSection invitation={invitation} />
-          <Suspense fallback={<SectionSkeleton />}>
-            <StorySection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <WeddingGallerySection />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <GallerySection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <DetailsSection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <MapSection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <ProgramSection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <RSVPSection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <FAQSection invitation={invitation} />
-          </Suspense>
-          <Suspense fallback={<SectionSkeleton />}>
-            <SocialSection />
-          </Suspense>
+          {invitation.showStorySection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <StorySection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showWeddingGallerySection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <WeddingGallerySection />
+            </Suspense>
+          )}
+          {invitation.showGallerySection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <GallerySection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showDetailsSection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <DetailsSection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showMapSection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <MapSection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showProgramSection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <ProgramSection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showRSVPSection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <RSVPSection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showFAQSection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <FAQSection invitation={invitation} />
+            </Suspense>
+          )}
+          {invitation.showSocialSection !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <SocialSection />
+            </Suspense>
+          )}
           <Suspense fallback={<div />}>
             <Footer invitation={invitation} />
           </Suspense>
