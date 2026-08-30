@@ -112,7 +112,7 @@ export default function SimpleElegantHero({ invitation }: Props) {
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.6 }}
         >
-          <Countdown invitation={invitation} />
+          <Countdown targetDate={invitation.weddingDate} />
         </motion.div>
 
         {/* Bottom decorative element */}
