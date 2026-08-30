@@ -879,21 +879,20 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
             Önizle
           </button>
         )}
-        {step < STEPS.length - 1 ? (
+        <button
+          type="submit"
+          disabled={loading}
+          className="admin-btn admin-btn-primary"
+        >
+          {loading ? "Kaydediliyor…" : "✓ Davetiyeyi Kaydet"}
+        </button>
+        {step < STEPS.length - 1 && (
           <button
             type="button"
             onClick={() => setStep(s => s + 1)}
             className="admin-btn admin-btn-primary"
           >
             İleri →
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={loading}
-            className="admin-btn admin-btn-primary"
-          >
-            {loading ? "Kaydediliyor…" : "✓ Davetiyeyi Kaydet"}
           </button>
         )}
       </div>
