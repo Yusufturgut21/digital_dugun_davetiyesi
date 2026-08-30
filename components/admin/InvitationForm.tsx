@@ -111,7 +111,24 @@ function ImageUpload({ value, onChange, label }: { value: string; onChange: (v: 
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => onChange(ev.target?.result as string);
+    reader.onload = (ev) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
+          else { width = Math.round((width * MAX) / height); height = MAX; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, width, height);
+        onChange(canvas.toDataURL("image/jpeg", 0.75));
+      };
+      img.src = ev.target?.result as string;
+    };
     reader.readAsDataURL(file);
   };
   return (
@@ -159,15 +176,39 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
     setForm(f => ({ ...f, [key]: value }));
 
   const galleryRef = useRef<HTMLInputElement>(null);
-  const addGalleryImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    files.forEach(file => {
+
+  const compressImage = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = ev => {
-        setForm(f => ({ ...f, galleryImages: [...f.galleryImages, ev.target?.result as string] }));
+      reader.onload = (ev) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const MAX = 1200;
+          let { width, height } = img;
+          if (width > MAX || height > MAX) {
+            if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
+            else { width = Math.round((width * MAX) / height); height = MAX; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return reject(new Error("canvas failed"));
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.75));
+        };
+        img.onerror = reject;
+        img.src = ev.target?.result as string;
       };
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
+
+  const addGalleryImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    for (const file of files) {
+      const url = await compressImage(file);
+      setForm(f => ({ ...f, galleryImages: [...f.galleryImages, url] }));
+    }
   };
   const removeGallery = (idx: number) =>
     setForm(f => ({ ...f, galleryImages: f.galleryImages.filter((_, i) => i !== idx) }));
