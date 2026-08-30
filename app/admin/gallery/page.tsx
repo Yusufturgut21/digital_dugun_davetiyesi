@@ -31,15 +31,18 @@ export default function AdminGalleryPage() {
         setSaving(true);
         setError("");
         setSuccess("");
+        console.log("[AdminGallery] Saving data:", { imageCount: newData.images.length, isActive: newData.isActive });
         try {
             const updated = await apiFetch<GalleryData>("/api/gallery", {
                 method: "PUT",
                 body: JSON.stringify({ images: newData.images, isActive: newData.isActive }),
             });
+            console.log("[AdminGallery] Saved successfully:", updated);
             setData(updated);
             setSuccess("Galeri başarıyla güncellendi.");
             setTimeout(() => setSuccess(""), 3000);
         } catch (err: any) {
+            console.error("[AdminGallery] Save error:", err);
             setError(err.message || "Kaydetme başarısız.");
         } finally {
             setSaving(false);

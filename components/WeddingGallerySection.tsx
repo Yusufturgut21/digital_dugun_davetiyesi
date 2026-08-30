@@ -95,11 +95,21 @@ export default function WeddingGallerySection() {
     fetch("/api/gallery")
       .then(r => r.json())
       .then(data => {
-        if (data && data.images && data.images.length > 0 && data.isActive !== false) {
+        console.log("[WeddingGallerySection] API Response:", data);
+        if (data && data.images && data.images.length > 0) {
+          console.log("[WeddingGallerySection] Setting gallery with", data.images.length, "images");
           setGlobalGallery(data.images.sort((a: any, b: any) => a.order - b.order));
+        } else {
+          console.log("[WeddingGallerySection] No images to display:", { 
+            hasData: !!data, 
+            hasImages: !!(data?.images), 
+            imageCount: data?.images?.length || 0
+          });
         }
       })
-      .catch(console.error)
+      .catch(err => {
+        console.error("[WeddingGallerySection] Error fetching gallery:", err);
+      })
       .finally(() => setLoading(false));
   }, []);
 
