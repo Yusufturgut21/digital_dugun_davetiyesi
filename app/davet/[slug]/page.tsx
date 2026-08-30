@@ -43,6 +43,8 @@ export default function DavetPage() {
     getInvitationBySlug(slug).then(inv => {
       setInvitation(inv ?? null);
       if (inv) {
+        // Sekme başlığını güncelle
+        document.title = `${inv.groomName} & ${inv.brideName} | Düğün Davetiyesi`;
         const hasHash = typeof window !== "undefined" && window.location.hash.length > 1;
         if (hasHash) {
           setShowEnvelope(false);
@@ -116,7 +118,7 @@ export default function DavetPage() {
           <ScrollProgress />
           <FloatingPetals />
           <MusicPlayer invitation={invitation} />
-          
+
           {/* Theme-based Hero */}
           {invitation.theme === "simple-elegant" ? (
             <SimpleElegantHero invitation={invitation} />
@@ -173,7 +175,11 @@ export default function DavetPage() {
           )}
           {invitation.showSocialSection !== false && (
             <Suspense fallback={<SectionSkeleton />}>
-              <SocialSection />
+              <SocialSection
+                hashtag={invitation.socialHashtag}
+                groomName={invitation.groomName}
+                brideName={invitation.brideName}
+              />
             </Suspense>
           )}
           <Suspense fallback={<div />}>

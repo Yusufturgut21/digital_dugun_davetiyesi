@@ -45,11 +45,11 @@ const socials = [
 ];
 
 export default function SocialSection({ hashtag, groomName, brideName }: Props) {
-  // Eğer custom hashtag yoksa, isimlere göre oluştur
-  const displayHashtag = hashtag || 
-    (groomName && brideName 
+  // Eğer custom hashtag varsa kullan, yoksa isimlere göre oluştur, yoksa hiç gösterme
+  const displayHashtag = hashtag ||
+    (groomName && brideName
       ? `#${groomName}${brideName}${new Date().getFullYear()}`
-      : "#AyşeMehmet2026");
+      : null);
 
   return (
     <section id="social" className="section-gap relative">
@@ -108,20 +108,22 @@ export default function SocialSection({ hashtag, groomName, brideName }: Props) 
         </div>
 
         {/* Hashtag */}
-        <motion.div
-          className="text-center mt-10"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-        >
-          <p className="font-sans text-xs tracking-[0.3em] uppercase mb-2" style={{ color: "#8B8178" }}>
-            Anılarınızı paylaşın
-          </p>
-          <p className="font-serif text-2xl sm:text-3xl" style={{ color: "#C9A84C" }}>
-            {displayHashtag}
-          </p>
-        </motion.div>
+        {displayHashtag && (
+          <motion.div
+            className="text-center mt-10"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
+            <p className="font-sans text-xs tracking-[0.3em] uppercase mb-2" style={{ color: "#8B8178" }}>
+              Anılarınızı paylaşın
+            </p>
+            <p className="font-serif text-2xl sm:text-3xl" style={{ color: "#C9A84C" }}>
+              {displayHashtag}
+            </p>
+          </motion.div>
+        )}
       </div>
     </section>
   );
