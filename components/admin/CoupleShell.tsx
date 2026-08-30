@@ -88,7 +88,13 @@ export default function CoupleShell({ children }: { children: React.ReactNode })
       )}
 
       <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-72 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
-        style={{ background: "rgba(255,255,255,0.03)", borderRight: "1px solid rgba(201,168,76,0.1)", paddingTop: user?.isImpersonating ? 40 : 0 }}>
+        style={{ 
+          background: "#0f0a06",
+          backgroundImage: "linear-gradient(to bottom, rgba(201,168,76,0.08), rgba(201,168,76,0.03))",
+          borderRight: "1px solid rgba(201,168,76,0.2)", 
+          paddingTop: user?.isImpersonating ? 40 : 0,
+          boxShadow: "2px 0 20px rgba(0,0,0,0.5)"
+        }}>
         
         {/* Header */}
         <div className="p-6 border-b flex items-center justify-between" style={{ borderColor: "rgba(201,168,76,0.1)" }}>
