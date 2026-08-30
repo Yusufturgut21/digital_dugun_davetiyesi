@@ -90,6 +90,7 @@ function LightboxNav({ onPrev, onNext, current, total }: { onPrev: () => void; o
 export default function WeddingGallerySection() {
   const [globalGallery, setGlobalGallery] = useState<{ id: string, url: string, order: number }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lightbox, setLightbox] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/gallery")
@@ -113,15 +114,7 @@ export default function WeddingGallerySection() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Sadece eklenen resimler varsa göster
-  if (loading || globalGallery.length === 0) return null;
-
   const photos: Photo[] = buildPhotos(globalGallery.map(img => img.url));
-
-  const subtitle = "DÜĞÜN GALERİSİ";
-  const title = "Hayalinizdeki Güne Ev Sahipliği Yapıyoruz";
-
-  const [lightbox, setLightbox] = useState<number | null>(null);
 
   const open = useCallback((id: number) => setLightbox(id), []);
   const close = useCallback(() => setLightbox(null), []);
@@ -143,6 +136,11 @@ export default function WeddingGallerySection() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [lightbox, close, prev, next]);
 
+  // Sadece eklenen resimler varsa göster
+  if (loading || globalGallery.length === 0) return null;
+
+  const subtitle = "DÜĞÜN GALERİSİ";
+  const title = "Hayalinizdeki Güne Ev Sahipliği Yapıyoruz";
   const currentPhoto = lightbox !== null ? photos[lightbox] : null;
 
   return (
