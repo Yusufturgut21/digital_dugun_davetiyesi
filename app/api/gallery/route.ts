@@ -35,6 +35,17 @@ export async function PUT(req: Request) {
             );
         }
 
+        // Base64 görsellerin toplam boyutunu kontrol et (~12MB MongoDB sınırı)
+        if (images) {
+            const totalSize = images.reduce((sum: number, img: { url: string }) => sum + img.url.length, 0);
+            if (totalSize > 12 * 1024 * 1024) {
+                return NextResponse.json(
+                    { error: "Görsellerin toplam boyutu çok büyük. Lütfen daha küçük görsel yükleyin." },
+                    { status: 400 }
+                );
+            }
+        }
+
         let gallery = await WeddingGallery.findOne();
         if (!gallery) {
             gallery = new WeddingGallery({ images: images || [], isActive: isActive !== undefined ? isActive : true });

@@ -50,7 +50,40 @@ export default function AdminGalleryPage() {
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const compressImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new window.Image();
+                img.onload = () => {
+                    const MAX = 1200;
+                    let { width, height } = img;
+                    if (width > MAX || height > MAX) {
+                        if (width > height) {
+                            height = Math.round((height * MAX) / width);
+                            width = MAX;
+                        } else {
+                            width = Math.round((width * MAX) / height);
+                            height = MAX;
+                        }
+                    }
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    if (!ctx) return reject(new Error("Canvas context failed"));
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL("image/jpeg", 0.75));
+                };
+                img.onerror = reject;
+                img.src = ev.target?.result as string;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files || !data) return;
 
@@ -59,28 +92,22 @@ export default function AdminGalleryPage() {
             return;
         }
 
-        Array.from(files).forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const url = ev.target?.result as string;
+        for (const file of Array.from(files)) {
+            try {
+                const url = await compressImage(file);
                 setData((prev) => {
-                    if (!prev) return prev;
-                    if (prev.images.length >= 8) return prev;
-
+                    if (!prev || prev.images.length >= 8) return prev;
                     const newImage = {
                         id: Math.random().toString(36).substring(7),
                         url,
-                        order: prev.images.length
+                        order: prev.images.length,
                     };
-                    const newImages = [...prev.images, newImage];
-                    // Don't auto-save immediately to let admin review, but can save.
-                    const newData = { ...prev, images: newImages };
-                    // we could auto-save or wait for explicit save
-                    return newData;
+                    return { ...prev, images: [...prev.images, newImage] };
                 });
-            };
-            reader.readAsDataURL(file);
-        });
+            } catch {
+                setError("Görsel işlenirken hata oluştu, lütfen tekrar deneyin.");
+            }
+        }
 
         // reset input
         if (fileInputRef.current) fileInputRef.current.value = "";
