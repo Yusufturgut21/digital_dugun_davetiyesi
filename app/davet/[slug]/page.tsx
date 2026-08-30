@@ -9,6 +9,8 @@ import FloatingPetals from "@/components/FloatingPetals";
 import HeroSection from "@/components/HeroSection";
 import MusicPlayer from "@/components/MusicPlayer";
 import Link from "next/link";
+import SimpleElegantHero from "@/components/themes/SimpleElegantHero";
+import IslamicQuoteSection from "@/components/themes/IslamicQuoteSection";
 
 const StorySection = lazy(() => import("@/components/StorySection"));
 const GallerySection = lazy(() => import("@/components/GallerySection"));
@@ -114,7 +116,21 @@ export default function DavetPage() {
           <ScrollProgress />
           <FloatingPetals />
           <MusicPlayer invitation={invitation} />
-          <HeroSection invitation={invitation} />
+          
+          {/* Theme-based Hero */}
+          {invitation.theme === "simple-elegant" ? (
+            <SimpleElegantHero invitation={invitation} />
+          ) : (
+            <HeroSection invitation={invitation} />
+          )}
+
+          {/* Islamic Quote for Simple Elegant theme */}
+          {invitation.theme === "simple-elegant" && invitation.showIslamicQuote !== false && (
+            <Suspense fallback={<SectionSkeleton />}>
+              <IslamicQuoteSection invitation={invitation} />
+            </Suspense>
+          )}
+
           {invitation.showStorySection !== false && (
             <Suspense fallback={<SectionSkeleton />}>
               <StorySection invitation={invitation} />

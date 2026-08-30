@@ -393,6 +393,42 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
         <Label>Kaynak / Sure Bilgisi</Label>
         <Input value={form.religiousSource ?? ""} onChange={v => set("religiousSource", v)} placeholder="Örn: Rum Suresi, 21. Ayet" />
       </div>
+
+      {/* Sade & Zarif Teması İçin Özel Alan */}
+      {form.theme === "simple-elegant" && (
+        <>
+          <div className="mt-6 pt-6 border-t" style={{ borderColor: "rgba(201,168,76,0.2)" }}>
+            <Label>İslami Alıntı / Ayet (Sade & Zarif Tema)</Label>
+            <Toggle value={form.showIslamicQuote !== false} onChange={v => set("showIslamicQuote", v)} label="İslami Alıntı Göster" />
+          </div>
+          <div>
+            <Label>Arapça Metin</Label>
+            <textarea
+              rows={3}
+              value={form.islamicQuoteArabic ?? ""}
+              onChange={e => set("islamicQuoteArabic", e.target.value)}
+              className="w-full px-4 py-3 rounded-xl font-sans text-sm outline-none transition-all resize-none"
+              style={{ ...inputStyle, direction: "rtl", fontFamily: "'Amiri', serif" }}
+              placeholder="Arapça ayet veya alıntı..."
+            />
+          </div>
+          <div>
+            <Label>Türkçe Meali</Label>
+            <textarea
+              rows={2}
+              value={form.islamicQuoteTurkish ?? ""}
+              onChange={e => set("islamicQuoteTurkish", e.target.value)}
+              className="w-full px-4 py-3 rounded-xl font-sans text-sm outline-none transition-all resize-none"
+              style={inputStyle}
+              placeholder="Türkçe meali..."
+            />
+          </div>
+          <div>
+            <Label>Kaynak</Label>
+            <Input value={form.islamicQuoteSource ?? ""} onChange={v => set("islamicQuoteSource", v)} placeholder="Örn: Rum Suresi, 21. Ayet" />
+          </div>
+        </>
+      )}
     </div>,
 
     // Step 4 — Mühür
@@ -567,6 +603,7 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
             ["minimal-white", "Minimal Beyaz", "#FFFFFF", "#333"],
             ["beige-gold", "Bej & Gold", "#F5EDD8", "#9A7B2F"],
             ["dark-premium", "Koyu Premium", "#0d0805", "#E8D5A3"],
+            ["simple-elegant", "Sade & Zarif", "#F5F3EE", "#4A5D3F"],
           ] as [Theme, string, string, string][]).map(([val, label, bg, accent]) => (
             <button
               key={val}
@@ -578,6 +615,19 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading, 
                 border: `1px solid ${form.theme === val ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.1)"}`,
               }}
             >
+              <div className="w-10 h-10 rounded-lg flex-shrink-0" style={{ background: bg, border: `2px solid ${accent}` }} />
+              <div className="flex-1">
+                <span className="font-sans text-sm block" style={{ color: form.theme === val ? "#E8D5A3" : "rgba(255,255,255,0.5)" }}>
+                  {label}
+                </span>
+                {val === "simple-elegant" && (
+                  <span className="font-sans text-xs block mt-0.5" style={{ color: "rgba(201,168,76,0.5)" }}>
+                    Geleneksel dokunuşlar, zarif hat detayları ve huzurlu bir tasarım
+                  </span>
+                )}
+              </div>
+              {form.theme === val && <span className="ml-auto text-yellow-400">✓</span>}
+            </button>
               <div className="w-10 h-10 rounded-lg flex-shrink-0" style={{ background: bg, border: `2px solid ${accent}` }} />
               <span className="font-sans text-sm" style={{ color: form.theme === val ? "#E8D5A3" : "rgba(255,255,255,0.5)" }}>
                 {label}

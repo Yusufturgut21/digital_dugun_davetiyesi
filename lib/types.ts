@@ -1,6 +1,6 @@
 export type SealType = "ottoman" | "gold-wax" | "burgundy-wax" | "classic" | "minimal";
 export type InvitationDesign = "ottoman" | "classic" | "minimal" | "gold-premium" | "cream-vintage";
-export type Theme = "cream-gold" | "ottoman-premium" | "minimal-white" | "beige-gold" | "dark-premium";
+export type Theme = "cream-gold" | "ottoman-premium" | "minimal-white" | "beige-gold" | "dark-premium" | "simple-elegant";
 export type ConjunctionType = "&" | "ve";
 
 export interface StoryItem {
@@ -53,6 +53,12 @@ export interface WeddingInvitation {
   showHadis: boolean;
   duaText?: string;
   religiousSource?: string;
+  
+  // Sade & Zarif tema için özel alanlar
+  islamicQuoteArabic?: string;
+  islamicQuoteTurkish?: string;
+  islamicQuoteSource?: string;
+  showIslamicQuote?: boolean;
 
   // Mühür
   sealType: SealType;
