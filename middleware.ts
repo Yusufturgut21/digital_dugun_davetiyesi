@@ -45,8 +45,10 @@ export async function middleware(req: NextRequest) {
   // Login page — redirect if already logged in
   if (pathname === "/login") {
     if (session) {
-      const dest = session.role === "super_admin" && !session.impersonatorId ? "/admin" : "/panel";
-      return NextResponse.redirect(new URL(dest, req.url));
+      if (session.role === "super_admin" && !session.impersonatorId) {
+        return NextResponse.redirect(new URL("/admin", req.url));
+      }
+      return NextResponse.redirect(new URL("/panel", req.url));
     }
     return NextResponse.next();
   }
@@ -54,8 +56,11 @@ export async function middleware(req: NextRequest) {
   // Root redirect
   if (pathname === "/") {
     if (!session) return NextResponse.redirect(new URL("/login", req.url));
-    const dest = session.role === "super_admin" && !session.impersonatorId ? "/admin" : "/panel";
-    return NextResponse.redirect(new URL(dest, req.url));
+    if (session.role === "super_admin" && !session.impersonatorId) {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+    // Çift için default panel yönlendirmesi - slug olmadan
+    return NextResponse.redirect(new URL("/panel", req.url));
   }
 
   // Protected routes

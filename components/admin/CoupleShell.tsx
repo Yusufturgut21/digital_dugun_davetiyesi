@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api-client";
 
@@ -15,14 +15,22 @@ interface UserInfo {
 export default function CoupleShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
   const [user, setUser] = useState<UserInfo | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     apiFetch<{ user: UserInfo | null }>("/api/auth/me").then((d) => {
-      if (d.user) setUser(d.user);
+      if (d.user) {
+        setUser(d.user);
+        // Eğer slug farklıysa doğru panel URL'sine yönlendir
+        if (d.user.invitationSlug && slug && d.user.invitationSlug !== slug) {
+          router.replace(`/panel/${d.user.invitationSlug}`);
+        }
+      }
     });
-  }, []);
+  }, [slug, router]);
 
   const logout = async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
@@ -35,27 +43,28 @@ export default function CoupleShell({ children }: { children: React.ReactNode })
     router.refresh();
   };
 
-  const previewHref = user?.invitationSlug ? `/davet/${user.invitationSlug}` : "/panel";
+  const panelSlug = user?.invitationSlug || slug;
+  const previewHref = panelSlug ? `/davet/${panelSlug}` : "#";
 
   const nav = [
-    { href: "/panel", label: "Dashboard", icon: "◇", exact: true },
-    { href: "/panel/edit?step=1", label: "Düğün Bilgileri", icon: "◈" },
-    { href: "/panel/edit?step=0", label: "Gelin & Damat", icon: "♡" },
-    { href: "/panel/edit?step=2", label: "Davetiye", icon: "✦" },
-    { href: "/panel/edit?step=6", label: "Fotoğraf Galerisi", icon: "📷" },
-    { href: "/panel/edit?step=7", label: "Müzik", icon: "♪" },
-    { href: "/panel/rsvp", label: "RSVP / Katılım", icon: "✉" },
+    { href: `/panel/${panelSlug}`, label: "Dashboard", icon: "◇", exact: true },
+    { href: `/panel/${panelSlug}/edit?step=1`, label: "Düğün Bilgileri", icon: "◈" },
+    { href: `/panel/${panelSlug}/edit?step=0`, label: "Gelin & Damat", icon: "♡" },
+    { href: `/panel/${panelSlug}/edit?step=2`, label: "Davetiye", icon: "✦" },
+    { href: `/panel/${panelSlug}/edit?step=6`, label: "Fotoğraf Galerisi", icon: "📷" },
+    { href: `/panel/${panelSlug}/edit?step=7`, label: "Müzik", icon: "♪" },
+    { href: `/panel/${panelSlug}/rsvp`, label: "RSVP / Katılım", icon: "✉" },
     { href: previewHref, label: "Davetiye Önizleme", icon: "👁", external: true },
-    { href: "/panel/account", label: "Şifre Değiştir", icon: "🔒" },
+    { href: `/panel/${panelSlug}/account`, label: "Şifre Değiştir", icon: "🔒" },
   ];
 
   const isActive = (item: typeof nav[0]) => {
     if (item.external) return false;
     if (item.exact) return pathname === item.href;
-    if (item.href.startsWith("/panel/edit")) {
-      return pathname === "/panel/edit";
+    if (item.href.includes("/edit")) {
+      return pathname.includes("/edit");
     }
-    return pathname.startsWith(item.href);
+    return pathname === item.href;
   };
 
   return (
