@@ -12,6 +12,7 @@ import Link from "next/link";
 
 const StorySection = lazy(() => import("@/components/StorySection"));
 const GallerySection = lazy(() => import("@/components/GallerySection"));
+const WeddingGallerySection = lazy(() => import("@/components/WeddingGallerySection"));
 const DetailsSection = lazy(() => import("@/components/DetailsSection"));
 const MapSection = lazy(() => import("@/components/MapSection"));
 const ProgramSection = lazy(() => import("@/components/ProgramSection"));
@@ -116,6 +117,9 @@ export default function DavetPage() {
           <HeroSection invitation={invitation} />
           <Suspense fallback={<SectionSkeleton />}>
             <StorySection invitation={invitation} />
+          </Suspense>
+          <Suspense fallback={<SectionSkeleton />}>
+            <WeddingGallerySection />
           </Suspense>
           <Suspense fallback={<SectionSkeleton />}>
             <GallerySection invitation={invitation} />

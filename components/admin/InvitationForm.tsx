@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { CreateInvitationInput, WeddingInvitation, SealType, InvitationDesign, Theme, ConjunctionType, StoryItem, FAQItem, ProgramItem } from "@/lib/types";
 import { PRESET_INVITATION_TEXTS, EMPTY_INVITATION, DEFAULT_STORY_ITEMS, DEFAULT_FAQ_ITEMS, DEFAULT_PROGRAM_ITEMS } from "@/lib/defaults";
+import { SAHRA_VENUE_NAME } from "@/lib/constants/sahra";
 
 type FormData = Omit<CreateInvitationInput, "galleryImages"> & { galleryImages: string[] };
 
@@ -11,6 +12,8 @@ interface Props {
   onSubmit: (data: CreateInvitationInput) => void;
   onPreview?: (data: CreateInvitationInput) => void;
   loading?: boolean;
+  hideLocationFields?: boolean;
+  initialStep?: number;
 }
 
 const STEPS = [
@@ -142,8 +145,8 @@ function ImageUpload({ value, onChange, label }: { value: string; onChange: (v: 
   );
 }
 
-export default function InvitationForm({ initial, onSubmit, onPreview, loading }: Props) {
-  const [step, setStep] = useState(0);
+export default function InvitationForm({ initial, onSubmit, onPreview, loading, hideLocationFields, initialStep = 0 }: Props) {
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), STEPS.length - 1));
   const [form, setForm] = useState<FormData>(() => {
     if (initial) {
       const { id, slug, createdAt, updatedAt, ...rest } = initial;
@@ -228,28 +231,40 @@ export default function InvitationForm({ initial, onSubmit, onPreview, loading }
           <Input type="time" value={form.weddingTime} onChange={v => set("weddingTime", v)} required />
         </div>
       </div>
-      <div>
-        <Label>Salon / Mekân Adı *</Label>
-        <Input value={form.venueName} onChange={v => set("venueName", v)} placeholder="The Grand Ballroom" required />
-      </div>
-      <div>
-        <Label>Adres</Label>
-        <Input value={form.address} onChange={v => set("address", v)} placeholder="Atatürk Cad. No:1" />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>İl *</Label>
-          <Input value={form.city} onChange={v => set("city", v)} placeholder="İstanbul" required />
+      {hideLocationFields ? (
+        <div className="rounded-xl p-4" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+          <p className="font-sans text-xs mb-1" style={{ color: "rgba(201,168,76,0.6)" }}>📍 Konum (Sabit)</p>
+          <p className="font-serif text-lg" style={{ color: "#E8D5A3" }}>{SAHRA_VENUE_NAME}</p>
+          <p className="font-sans text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Konum bilgisi sistem genelinde sabittir ve değiştirilemez.
+          </p>
         </div>
-        <div>
-          <Label>İlçe</Label>
-          <Input value={form.district} onChange={v => set("district", v)} placeholder="Beşiktaş" />
-        </div>
-      </div>
-      <div>
-        <Label>Google Maps Linki</Label>
-        <Input value={form.mapUrl ?? ""} onChange={v => set("mapUrl", v)} placeholder="https://maps.google.com/..." />
-      </div>
+      ) : (
+        <>
+          <div>
+            <Label>Salon / Mekân Adı *</Label>
+            <Input value={form.venueName} onChange={v => set("venueName", v)} placeholder="Sahra Düğün Salonu" required />
+          </div>
+          <div>
+            <Label>Adres</Label>
+            <Input value={form.address} onChange={v => set("address", v)} placeholder="Adres" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>İl *</Label>
+              <Input value={form.city} onChange={v => set("city", v)} placeholder="İstanbul" required />
+            </div>
+            <div>
+              <Label>İlçe</Label>
+              <Input value={form.district} onChange={v => set("district", v)} placeholder="Küçükçekmece" />
+            </div>
+          </div>
+          <div>
+            <Label>Google Maps Linki</Label>
+            <Input value={form.mapUrl ?? ""} onChange={v => set("mapUrl", v)} placeholder="https://maps.google.com/..." />
+          </div>
+        </>
+      )}
     </div>,
 
     // Step 2 — Davet metni

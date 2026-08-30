@@ -2,17 +2,10 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Invitation } from "@/lib/models/Invitation";
 import { CreateInvitationInput } from "@/lib/types";
-
-function generateSlug(brideName: string, groomName: string): string {
-  const normalize = (s: string) =>
-    s.replace(/İ/g, "i").replace(/Ğ/g, "g").replace(/Ü/g, "u")
-      .replace(/Ş/g, "s").replace(/I/g, "i").replace(/Ö/g, "o").replace(/Ç/g, "c")
-      .toLowerCase()
-      .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s")
-      .replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c")
-      .replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
-  return `${normalize(groomName)}-${normalize(brideName)}` || `davet-${Date.now()}`;
-}
+import { generateUniqueSlug } from "@/lib/slug";
+import { requireSuperAdmin, handleAuthError } from "@/lib/auth/authorization";
+import { SAHRA_VENUE_FIELDS } from "@/lib/constants/sahra";
+import { serializeInvitation } from "@/lib/invitation-utils";
 
 export async function GET(req: Request) {
   await connectDB();
@@ -20,48 +13,34 @@ export async function GET(req: Request) {
   const slug = searchParams.get("slug");
 
   if (slug) {
-    const inv = await Invitation.findOne({ slug }).lean() as any;
+    const inv = await Invitation.findOne({ slug, isActive: true }).lean() as Record<string, unknown> | null;
     if (!inv) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json({
-      ...inv,
-      id: inv._id.toString(),
-      _id: undefined,
-      createdAt: inv.createdAt?.toISOString?.() ?? inv.createdAt,
-      updatedAt: inv.updatedAt?.toISOString?.() ?? inv.updatedAt,
-    });
+    return NextResponse.json(serializeInvitation(inv));
+  }
+
+  try {
+    await requireSuperAdmin();
+  } catch (err) {
+    return handleAuthError(err);
   }
 
   const invitations = await Invitation.find().sort({ createdAt: -1 }).lean();
-  const mapped = invitations.map((inv: any) => ({
-    ...inv,
-    id: inv._id.toString(),
-    _id: undefined,
-    createdAt: inv.createdAt?.toISOString?.() ?? inv.createdAt,
-    updatedAt: inv.updatedAt?.toISOString?.() ?? inv.updatedAt,
-  }));
-  return NextResponse.json(mapped);
+  return NextResponse.json(invitations.map((inv) => serializeInvitation(inv as Record<string, unknown>)));
 }
 
 export async function POST(req: Request) {
-  await connectDB();
-  const body: CreateInvitationInput = await req.json();
+  try {
+    await requireSuperAdmin();
+    await connectDB();
+    const body: CreateInvitationInput = await req.json();
 
-  const baseSlug = generateSlug(body.brideName, body.groomName);
-  const year = new Date().getFullYear();
-  let slug = baseSlug;
-  let counter = 1;
+    const slug = await generateUniqueSlug(body.groomName, body.brideName, async (s) =>
+      Boolean(await Invitation.exists({ slug: s }))
+    );
 
-  while (await Invitation.exists({ slug })) {
-    slug = counter === 1 ? `${baseSlug}-${year}` : `${baseSlug}-${year}-${counter}`;
-    counter++;
+    const inv = await Invitation.create({ ...body, ...SAHRA_VENUE_FIELDS, slug });
+    return NextResponse.json(serializeInvitation(inv.toObject() as Record<string, unknown>), { status: 201 });
+  } catch (err) {
+    return handleAuthError(err);
   }
-
-  const inv = await Invitation.create({ ...body, slug });
-  return NextResponse.json({
-    ...inv.toObject(),
-    id: inv._id.toString(),
-    _id: undefined,
-    createdAt: inv.createdAt.toISOString(),
-    updatedAt: inv.updatedAt.toISOString(),
-  }, { status: 201 });
 }

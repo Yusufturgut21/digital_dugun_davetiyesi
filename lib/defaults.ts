@@ -1,4 +1,5 @@
 import { CreateInvitationInput } from "./types";
+import { SAHRA_VENUE_FIELDS } from "./constants/sahra";
 
 export const DEFAULT_INVITATION_TEXT =
   "Bu mutlu günümüzde sizleri de aramızda görmekten büyük mutluluk duyarız.";
@@ -39,11 +40,11 @@ export const EMPTY_INVITATION: Omit<CreateInvitationInput, "brideName" | "groomN
   conjunction: "&",
   weddingDate: "",
   weddingTime: "15:00",
-  venueName: "",
-  address: "",
-  city: "",
-  district: "",
-  mapUrl: "",
+  venueName: SAHRA_VENUE_FIELDS.venueName,
+  address: SAHRA_VENUE_FIELDS.address,
+  city: SAHRA_VENUE_FIELDS.city,
+  district: SAHRA_VENUE_FIELDS.district,
+  mapUrl: SAHRA_VENUE_FIELDS.mapUrl,
   invitationText: DEFAULT_INVITATION_TEXT,
   showBesmele: true,
   showAyet: true,

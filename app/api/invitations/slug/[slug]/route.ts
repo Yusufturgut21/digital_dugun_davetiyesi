@@ -4,7 +4,7 @@ import { Invitation } from "@/lib/models/Invitation";
 
 export async function GET(_: Request, { params }: { params: { slug: string } }) {
   await connectDB();
-  const inv = await Invitation.findOne({ slug: params.slug }).lean() as any;
+  const inv = await Invitation.findOne({ slug: params.slug, isActive: true }).lean() as any;
   if (!inv) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({
     ...inv,

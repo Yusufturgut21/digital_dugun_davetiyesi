@@ -16,15 +16,44 @@ export default function RSVPSection({ invitation }: Props) {
   const [form, setForm] = useState<FormState>({ name: "", phone: "", count: "1", note: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!invitation?.slug) {
+      setError("Davetiye bilgisi yüklenemedi.");
+      return;
+    }
     setLoading(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1500));
-    setLoading(false);
-    setSubmitted(true);
+    setError("");
+    try {
+      const res = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: invitation.slug,
+          guestName: form.name,
+          phone: form.phone,
+          guestCount: form.count === "4+" ? 4 : parseInt(form.count),
+          attendance: "yes",
+          note: form.note,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gönderilemedi");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Bir hata oluştu");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const deadlineText = invitation?.weddingDate
+    ? new Date(invitation.weddingDate).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
+    : "düğün tarihine";
 
   return (
     <section id="rsvp" className="section-gap relative">
@@ -57,8 +86,11 @@ export default function RSVPSection({ invitation }: Props) {
           </h2>
           <div className="gold-divider mt-6" />
           <p className="mt-6 font-sans font-light text-sm text-white/50 tracking-wide">
-            Lütfen 31 Ocak 2026 tarihine kadar bildirim yapınız.
+            Lütfen {deadlineText} kadar bildirim yapınız.
           </p>
+          {error && (
+            <p className="mt-3 font-sans text-sm text-red-400">{error}</p>
+          )}
         </motion.div>
 
         <AnimatePresence mode="wait">
