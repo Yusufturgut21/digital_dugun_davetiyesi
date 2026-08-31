@@ -21,9 +21,11 @@ export default function CouplesPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [passwordModal, setPasswordModal] = useState<{ id: string; name: string } | null>(null);
+  const [credModal, setCredModal] = useState<{ id: string; name: string; username: string } | null>(null);
+  const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [credError, setCredError] = useState("");
+  const [credSaving, setCredSaving] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -63,20 +65,41 @@ export default function CouplesPage() {
     load();
   };
 
-  const resetPassword = async () => {
-    if (!passwordModal || !newPassword) return;
-    if (newPassword.length < 6) {
-      setPasswordError("Şifre en az 6 karakter olmalı.");
+  const openCredModal = (c: CoupleRow) => {
+    setCredModal({ id: c.id, name: `${c.groomName} & ${c.brideName}`, username: c.username || "" });
+    setNewUsername(c.username || "");
+    setNewPassword("");
+    setCredError("");
+  };
+
+  const saveCredentials = async () => {
+    if (!credModal) return;
+    if (!newUsername.trim()) {
+      setCredError("Kullanıcı adı boş olamaz.");
       return;
     }
-    setPasswordError("");
-    await apiFetch(`/api/admin/couples/${passwordModal.id}`, {
-      method: "PUT",
-      body: JSON.stringify({ password: newPassword }),
-    });
-    setPasswordModal(null);
-    setNewPassword("");
-    alert("Şifre başarıyla güncellendi.");
+    if (newPassword && newPassword.length < 6) {
+      setCredError("Şifre en az 6 karakter olmalı.");
+      return;
+    }
+    setCredError("");
+    setCredSaving(true);
+    try {
+      await apiFetch(`/api/admin/couples/${credModal.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          username: newUsername.trim(),
+          ...(newPassword ? { password: newPassword } : {}),
+        }),
+      });
+      setCredModal(null);
+      load();
+      alert("Kullanıcı bilgileri başarıyla güncellendi.");
+    } catch (err) {
+      setCredError(err instanceof Error ? err.message : "Güncelleme başarısız.");
+    } finally {
+      setCredSaving(false);
+    }
   };
 
   return (
@@ -91,6 +114,7 @@ export default function CouplesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Gelin, damat veya kullanıcı adı ara..."
+          autoComplete="off"
           className="flex-1 px-4 py-2.5 rounded-xl font-sans text-sm outline-none"
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "#E8D5A3" }}
         />
@@ -139,7 +163,7 @@ export default function CouplesPage() {
                       <Link href={`/admin/couples/${c.id}`} className="action-btn">Düzenle</Link>
                       <button onClick={() => impersonate(c.id)} className="action-btn">Panele Gir</button>
                       <Link href={`/davet/${c.slug}`} target="_blank" className="action-btn">Davetiye</Link>
-                      <button onClick={() => { setPasswordModal({ id: c.id, name: `${c.groomName} & ${c.brideName}` }); setNewPassword(""); setPasswordError(""); }} className="action-btn">Şifre Değiştir</button>
+                      <button onClick={() => openCredModal(c)} className="action-btn">Şifre Değiştir</button>
                       <button onClick={() => toggleStatus(c.id, c.isActive)} className="action-btn">
                         {c.isActive ? "Pasif" : "Aktif"}
                       </button>
@@ -153,20 +177,68 @@ export default function CouplesPage() {
         </div>
       </div>
 
-      {passwordModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+      {/* Kullanıcı Adı & Şifre Değiştir Modal */}
+      {credModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.75)" }}>
           <div className="w-full max-w-md rounded-2xl p-6 space-y-4" style={{ background: "#1a1208", border: "1px solid rgba(201,168,76,0.2)" }}>
-            <h3 className="font-serif text-xl" style={{ color: "#E8D5A3" }}>Şifre Değiştir</h3>
-            <p className="font-sans text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>{passwordModal.name}</p>
-            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Yeni şifre (min. 6 karakter)"
-              className="w-full px-4 py-3 rounded-xl font-sans text-sm outline-none"
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "#E8D5A3" }} />
-            {passwordError && <p className="text-red-400 text-sm">{passwordError}</p>}
-            <div className="flex gap-2 justify-end">
-              <button onClick={() => setPasswordModal(null)} className="action-btn">İptal</button>
-              <button onClick={resetPassword} className="admin-btn admin-btn-primary">Kaydet</button>
+            <div>
+              <h3 className="font-serif text-xl" style={{ color: "#E8D5A3" }}>Kullanıcı Bilgilerini Değiştir</h3>
+              <p className="font-sans text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{credModal.name}</p>
             </div>
+
+            {/* autocomplete="off" + gizli dummy alanlar → tarayıcı autocomplete'ini engeller */}
+            <form autoComplete="off" onSubmit={(e) => { e.preventDefault(); saveCredentials(); }} className="space-y-4">
+              <input type="text" style={{ display: "none" }} autoComplete="username" readOnly />
+              <input type="password" style={{ display: "none" }} autoComplete="current-password" readOnly />
+
+              <div>
+                <label className="font-sans text-xs tracking-widest uppercase mb-1.5 block" style={{ color: "rgba(201,168,76,0.6)" }}>
+                  Kullanıcı Adı
+                </label>
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  autoComplete="off"
+                  name="couple-username"
+                  className="w-full px-4 py-3 rounded-xl font-sans text-sm outline-none"
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "#E8D5A3" }}
+                />
+              </div>
+
+              <div>
+                <label className="font-sans text-xs tracking-widest uppercase mb-1.5 block" style={{ color: "rgba(201,168,76,0.6)" }}>
+                  Yeni Şifre{" "}
+                  <span style={{ color: "rgba(255,255,255,0.3)", textTransform: "none", letterSpacing: 0 }}>
+                    (boş bırakılırsa değişmez)
+                  </span>
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  name="couple-new-password"
+                  placeholder="Min. 6 karakter"
+                  className="w-full px-4 py-3 rounded-xl font-sans text-sm outline-none"
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)", color: "#E8D5A3" }}
+                />
+              </div>
+
+              {credError && <p className="text-red-400 text-sm">{credError}</p>}
+
+              <div className="flex gap-2 justify-end pt-2">
+                <button type="button" onClick={() => setCredModal(null)} className="action-btn">İptal</button>
+                <button
+                  type="submit"
+                  disabled={credSaving}
+                  className="admin-btn admin-btn-primary"
+                  style={{ opacity: credSaving ? 0.6 : 1 }}
+                >
+                  {credSaving ? "Kaydediliyor…" : "Kaydet"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

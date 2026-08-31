@@ -8,6 +8,15 @@ import { logAudit } from "@/lib/models/AuditLog";
 export async function POST(req: Request) {
   try {
     const session = await requireAuth();
+
+    // Sadece super_admin şifre değiştirebilir; çiftler bu endpoint'i kullanamaz
+    if (session.role !== "super_admin") {
+      return NextResponse.json(
+        { error: "Şifre değişikliği yalnızca Sahra Admin tarafından yapılabilir." },
+        { status: 403 }
+      );
+    }
+
     const { currentPassword, newPassword, confirmPassword } = await req.json();
 
     if (!currentPassword || !newPassword) {

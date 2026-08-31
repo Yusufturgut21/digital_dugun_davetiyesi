@@ -39,13 +39,26 @@ function buildPhotos(images: string[]): Photo[] {
 
 
 function GalleryImage({ src, alt, className, priority }: { src: string; alt: string; className?: string; priority?: boolean }) {
+  const isData = isDataUrl(src);
+
+  if (isData) {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        className={`absolute inset-0 w-full h-full ${className || ""}`}
+        loading={priority ? "eager" : "lazy"}
+      />
+    );
+  }
+
   return (
     <Image
       src={src}
       alt={alt}
       fill
       priority={priority}
-      unoptimized={isDataUrl(src)}
+      unoptimized={isData}
       className={className}
       sizes="(max-width: 640px) 50vw, 33vw"
     />
