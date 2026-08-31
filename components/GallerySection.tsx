@@ -47,11 +47,21 @@ interface Props { invitation?: WeddingInvitation; }
 
 function GalleryImage({ src, alt, className, priority }: { src: string; alt: string; className?: string; priority?: boolean }) {
   const isData = isDataUrl(src);
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isData && !objectUrl) {
+      fetch(src)
+        .then(res => res.blob())
+        .then(blob => setObjectUrl(URL.createObjectURL(blob)))
+        .catch(console.error);
+    }
+  }, [src, isData, objectUrl]);
 
   if (isData) {
     return (
       <img
-        src={src}
+        src={objectUrl || src}
         alt={alt}
         className={`absolute inset-0 w-full h-full ${className || ""}`}
         loading={priority ? "eager" : "lazy"}
@@ -177,29 +187,32 @@ export default function GallerySection({ invitation }: Props) {
           {photos.map((photo, i) => (
             <motion.div
               key={photo.id}
-              className={`${photo.span} relative w-full h-full block group cursor-pointer`}
+              className={`${photo.span} relative w-full h-full block min-h-[160px] group cursor-pointer`}
               initial={{ opacity: 0, y: 24, rotate: photo.rotate }}
               whileInView={{ opacity: 1, y: 0, rotate: photo.rotate }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "250px" }}
               transition={{ delay: i * 0.06, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ scale: 1.02, rotate: 0, zIndex: 10 }}
               onClick={() => open(i)}
             >
               {/* Polaroid frame */}
               <div
-                className="relative block w-full h-full rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 group-hover:shadow-2xl"
+                className="relative block w-full h-full rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 group-hover:shadow-2xl isolate scale-100 transform-gpu"
                 style={{
                   background: "#fff",
                   padding: "6px 6px 20px",
                   boxShadow: "0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(201,168,76,0.1)",
                 }}
               >
-                <div className="relative w-full h-full rounded-lg overflow-hidden">
+                <div
+                  className="relative w-full h-full rounded-lg overflow-hidden isolate"
+                  style={{ WebkitMaskImage: "-webkit-radial-gradient(white, black)" }}
+                >
                   <GalleryImage
                     src={photo.src}
                     alt={photo.alt}
                     priority={i < 2}
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105 transform-gpu"
                   />
                   {/* Subtle vignette */}
                   <div className="absolute inset-0 pointer-events-none"
