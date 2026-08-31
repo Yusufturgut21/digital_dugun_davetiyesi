@@ -177,7 +177,7 @@ export default function GallerySection({ invitation }: Props) {
           {photos.map((photo, i) => (
             <motion.div
               key={photo.id}
-              className={`${photo.span} relative group cursor-pointer`}
+              className={`${photo.span} relative w-full h-full block group cursor-pointer`}
               initial={{ opacity: 0, y: 24, rotate: photo.rotate }}
               whileInView={{ opacity: 1, y: 0, rotate: photo.rotate }}
               viewport={{ once: true }}
@@ -187,7 +187,7 @@ export default function GallerySection({ invitation }: Props) {
             >
               {/* Polaroid frame */}
               <div
-                className="absolute inset-0 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 group-hover:shadow-2xl"
+                className="relative block w-full h-full rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 group-hover:shadow-2xl"
                 style={{
                   background: "#fff",
                   padding: "6px 6px 20px",
