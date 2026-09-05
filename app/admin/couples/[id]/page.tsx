@@ -71,6 +71,35 @@ export default function EditCouplePage() {
       </div>
 
       <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
+        <div className="mb-4 p-3 rounded-lg" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+          <label className="font-sans text-xs tracking-widest uppercase mb-2 block" style={{ color: "rgba(201,168,76,0.7)" }}>
+            Müşteri Login Linki
+          </label>
+          <div className="flex gap-2">
+            <input 
+              readOnly 
+              value={typeof window !== 'undefined' ? `${window.location.origin}/login/${invitation.slug}` : ''} 
+              className="flex-1 px-3 py-2 rounded-lg font-sans text-xs outline-none"
+              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(201,168,76,0.3)", color: "#E8D5A3" }} 
+            />
+            <button 
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  navigator.clipboard.writeText(`${window.location.origin}/login/${invitation.slug}`);
+                  alert('Link kopyalandı!');
+                }
+              }}
+              className="px-4 py-2 rounded-lg font-sans text-xs"
+              style={{ background: "linear-gradient(135deg, #C9A84C, #E8D5A3)", color: "#1a0f08" }}
+            >
+              Kopyala
+            </button>
+          </div>
+          <p className="font-sans text-xs mt-2" style={{ color: "rgba(201,168,76,0.5)" }}>
+            Bu linki müşteriye göndererek direkt kendi paneline erişim sağlayabilirsiniz.
+          </p>
+        </div>
+
         <div>
           <label className="font-sans text-xs tracking-widest uppercase mb-1 block" style={{ color: "rgba(201,168,76,0.5)" }}>Kullanıcı Adı</label>
           <input value={username} onChange={(e) => setUsername(e.target.value)}

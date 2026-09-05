@@ -8,7 +8,7 @@ import { SessionPayload } from "@/lib/auth/jwt";
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { username, password } = await req.json();
+    const { username, password, slug } = await req.json();
 
     if (!username || !password) {
       return NextResponse.json({ error: "Kullanıcı adı ve şifre gerekli." }, { status: 400 });
@@ -17,6 +17,15 @@ export async function POST(req: Request) {
     const user = await User.findOne({ username: username.toLowerCase().trim() }).select("+passwordHash");
     if (!user) {
       return NextResponse.json({ error: "Kullanıcı adı veya şifre hatalı." }, { status: 401 });
+    }
+
+    // Slug kontrolü - eğer slug gönderildiyse, kullanıcının o invitation'a erişimi var mı kontrol et
+    if (slug && user.role === "couple") {
+      const WeddingInvitation = (await import("@/lib/models/WeddingInvitation")).WeddingInvitation;
+      const invitation = await WeddingInvitation.findById(user.invitationId);
+      if (!invitation || invitation.slug !== slug) {
+        return NextResponse.json({ error: "Bu sayfaya erişim yetkiniz yok." }, { status: 403 });
+      }
     }
 
     if (user.status === "inactive") {

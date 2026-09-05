@@ -133,21 +133,36 @@ export default function CouplesPage() {
           <table className="w-full text-left">
             <thead>
               <tr style={{ background: "rgba(201,168,76,0.08)" }}>
-                {["Gelin", "Damat", "Kullanıcı Adı", "Düğün Tarihi", "Durum", "İşlemler"].map((h) => (
+                {["Gelin", "Damat", "Kullanıcı Adı", "Login Linki", "Düğün Tarihi", "Durum", "İşlemler"].map((h) => (
                   <th key={h} className="px-4 py-3 font-sans text-xs tracking-widest uppercase" style={{ color: "rgba(201,168,76,0.6)" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Yükleniyor…</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Yükleniyor…</td></tr>
               ) : couples.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Çift bulunamadı</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Çift bulunamadı</td></tr>
               ) : couples.map((c) => (
                 <tr key={c.id} className="border-t" style={{ borderColor: "rgba(201,168,76,0.08)" }}>
                   <td className="px-4 py-3 font-sans text-sm" style={{ color: "#E8D5A3" }}>{c.brideName}</td>
                   <td className="px-4 py-3 font-sans text-sm" style={{ color: "#E8D5A3" }}>{c.groomName}</td>
                   <td className="px-4 py-3 font-sans text-xs" style={{ color: "rgba(201,168,76,0.6)" }}>@{c.username}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          const link = `${window.location.origin}/login/${c.slug}`;
+                          navigator.clipboard.writeText(link);
+                          alert('Login linki kopyalandı!');
+                        }
+                      }}
+                      className="action-btn"
+                      style={{ background: "linear-gradient(135deg, #C9A84C, #E8D5A3)", color: "#1a0f08", border: "none", fontWeight: 500 }}
+                    >
+                      Linki Kopyala
+                    </button>
+                  </td>
                   <td className="px-4 py-3 font-sans text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{c.weddingDate || "—"}</td>
                   <td className="px-4 py-3">
                     <span className="text-xs px-2 py-0.5 rounded-full" style={{
