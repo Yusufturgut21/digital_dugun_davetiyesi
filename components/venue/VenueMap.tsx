@@ -9,6 +9,14 @@ interface Props {
 export default function VenueMap({ venue }: Props) {
   if (!venue.mapUrl && !venue.address) return null;
 
+  // compute iframe src safely to avoid inserting "/embed" twice
+  let iframeSrc = venue.mapUrl || "";
+  if (iframeSrc.includes("/maps/embed") || iframeSrc.includes("embed?pb=")) {
+    // use as-is
+  } else if (iframeSrc.includes("/maps/")) {
+    iframeSrc = iframeSrc.replace("/maps/", "/maps/embed/");
+  }
+
   return (
     <section className="py-20 px-6 bg-gray-50">
       <div className="max-w-6xl mx-auto">
@@ -49,13 +57,13 @@ export default function VenueMap({ venue }: Props) {
           {venue.mapUrl && (
             <div className="rounded-2xl overflow-hidden shadow-xl h-[400px]">
               <iframe
-                src={venue.mapUrl.replace("/maps/", "/maps/embed/")}
+                src={iframeSrc}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
+                referrerPolicy="strict-origin-when-cross-origin"
               />
             </div>
           )}

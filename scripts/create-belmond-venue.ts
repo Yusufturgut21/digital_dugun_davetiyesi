@@ -57,7 +57,7 @@ Modern mimarimiz ve profesyonel hizmet anlayışımızla düğününüzü unutul
   address: "Ovabağ Diyarbakır Yolu 21010 Yenişehir",
   city: "Diyarbakır",
   district: "Sur",
-  mapUrl: "https://maps.app.goo.gl/CGWpWHctqbD1yj7EA",
+  mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d403063.9644900334!2d39.78785856322249!3d37.885150789837745!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x407521a04985f109%3A0xcaa2779a21f21816!2zQkVMTU9ORCBLxLFyIETDvMSfw7xuIHwgQmFsbyB8IEtvbnNlciBTYWxvbnU!5e0!3m2!1str!2str!4v1789206723814!5m2!1str!2str",
   instagramUrl: "https://instagram.com/belmonddugunciftligi",
   
   heroImage: "https://lh5.googleusercontent.com/p/AF1QipMqBCL5nQIEZiPPXPy9yx9xZPxjhiQEYdVLwxrT=w408-h306-k-no",
