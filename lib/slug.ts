@@ -8,6 +8,10 @@ function normalizeSlugPart(s: string): string {
     .replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 }
 
+export function generateSlug(name: string): string {
+  return normalizeSlugPart(name) || `slug-${Date.now()}`;
+}
+
 export async function generateUniqueSlug(
   groomName: string,
   brideName: string,

@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { VenueWebsite } from "../types";
+import { VenueWebsite as VenueWebsiteType } from "../types";
 
-export interface VenueWebsiteDocument extends Omit<VenueWebsite, "id">, Document {}
+export interface VenueWebsiteDocument extends Omit<VenueWebsiteType, "id">, Document {}
 
 const VenueFeatureSchema = new Schema(
   { icon: String, title: String, description: String },

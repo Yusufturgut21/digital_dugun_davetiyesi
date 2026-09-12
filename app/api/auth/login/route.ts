@@ -21,8 +21,8 @@ export async function POST(req: Request) {
 
     // Slug kontrolü - eğer slug gönderildiyse, kullanıcının o invitation'a erişimi var mı kontrol et
     if (slug && user.role === "couple") {
-      const WeddingInvitation = (await import("@/lib/models/WeddingInvitation")).WeddingInvitation;
-      const invitation = await WeddingInvitation.findById(user.invitationId);
+      const { Invitation } = await import("@/lib/models/Invitation");
+      const invitation = await Invitation.findById(user.invitationId);
       if (!invitation || invitation.slug !== slug) {
         return NextResponse.json({ error: "Bu sayfaya erişim yetkiniz yok." }, { status: 403 });
       }
