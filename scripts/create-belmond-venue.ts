@@ -1,3 +1,9 @@
+// Load environment variables first
+import { config } from "dotenv";
+import { resolve } from "path";
+config({ path: resolve(__dirname, "../.env.local") });
+
+// Now import other modules
 import { connectDB } from "../lib/mongodb";
 import { VenueWebsite } from "../lib/models/VenueWebsite";
 import { generateSlug } from "../lib/slug";
