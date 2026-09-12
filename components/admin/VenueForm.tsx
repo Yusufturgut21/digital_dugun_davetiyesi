@@ -5,6 +5,8 @@ import { apiFetch } from "@/lib/api-client";
 import { VenueWebsite, VenueFeature, VenuePackage } from "@/lib/types";
 import { Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
+import ImageUpload from "./ImageUpload";
+import MultiImageUpload from "./MultiImageUpload";
 
 interface Props {
   venueId?: string;
@@ -266,44 +268,44 @@ export default function VenueForm({ venueId }: Props) {
 
       {/* Görseller */}
       <div className="admin-card">
-        <h3 className="admin-card-title">Görseller & Video</h3>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="admin-field">
-            <label>Hero Görsel URL</label>
-            <input
-              type="url"
-              value={venue.heroImage}
-              onChange={(e) => setVenue({ ...venue, heroImage: e.target.value })}
-            />
-          </div>
-          <div className="admin-field">
-            <label>Hero Video URL</label>
-            <input
-              type="url"
-              value={venue.heroVideo}
-              onChange={(e) => setVenue({ ...venue, heroVideo: e.target.value })}
-            />
-          </div>
+        <h3 className="admin-card-title">Görseller</h3>
+        
+        <ImageUpload
+          label="Ana Görsel (Hero)"
+          value={venue.heroImage}
+          onChange={(value) => setVenue({ ...venue, heroImage: value })}
+          maxWidth={1920}
+          quality={0.85}
+        />
+
+        <div className="admin-field mt-6">
+          <label>Hero Video URL (Opsiyonel)</label>
+          <input
+            type="url"
+            value={venue.heroVideo}
+            onChange={(e) => setVenue({ ...venue, heroVideo: e.target.value })}
+            placeholder="https://example.com/video.mp4"
+          />
+          <p className="text-xs mt-1" style={{ color: "rgba(201,168,76,0.5)" }}>
+            Video varsa görsel yerine oynatılır
+          </p>
         </div>
-        <div className="admin-field">
-          <label>Galeri Görselleri (Her satıra bir URL)</label>
-          <textarea
-            value={venue.galleryImages?.join("\n")}
-            onChange={(e) =>
-              setVenue({ ...venue, galleryImages: e.target.value.split("\n").filter((s) => s.trim()) })
-            }
-            rows={4}
-            placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
+
+        <div className="mt-6">
+          <MultiImageUpload
+            label="Salon Galerisi"
+            images={venue.galleryImages || []}
+            onChange={(images) => setVenue({ ...venue, galleryImages: images })}
+            maxImages={20}
           />
         </div>
-        <div className="admin-field">
-          <label>Gerçek Düğün Görselleri (Her satıra bir URL)</label>
-          <textarea
-            value={venue.realWeddingImages?.join("\n")}
-            onChange={(e) =>
-              setVenue({ ...venue, realWeddingImages: e.target.value.split("\n").filter((s) => s.trim()) })
-            }
-            rows={4}
+
+        <div className="mt-6">
+          <MultiImageUpload
+            label="Gerçek Düğün Görselleri"
+            images={venue.realWeddingImages || []}
+            onChange={(images) => setVenue({ ...venue, realWeddingImages: images })}
+            maxImages={20}
           />
         </div>
       </div>
