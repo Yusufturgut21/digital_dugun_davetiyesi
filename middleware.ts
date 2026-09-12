@@ -5,10 +5,12 @@ import { COOKIE_NAME, verifyToken } from "@/lib/auth/jwt";
 const PUBLIC_PATHS = [
   "/login",
   "/davet",
+  "/salon",
   "/api/auth/login",
   "/api/auth/seed",
   "/api/invitations",
   "/api/rsvp",
+  "/api/venues",
 ];
 
 function isPublicPath(pathname: string): boolean {
@@ -30,10 +32,12 @@ export async function middleware(req: NextRequest) {
 
   // Public guest invitation slug lookup
   if (pathname.startsWith("/davet/")) return NextResponse.next();
+  if (pathname.startsWith("/salon/")) return NextResponse.next();
   if (pathname === "/api/invitations" && req.method === "GET") {
     const slug = req.nextUrl.searchParams.get("slug");
     if (slug) return NextResponse.next();
   }
+  if (pathname.startsWith("/api/venues")) return NextResponse.next();
   if (pathname === "/api/rsvp" && req.method === "POST") return NextResponse.next();
   if (pathname === "/api/auth/login" && req.method === "POST") return NextResponse.next();
   if (pathname === "/api/auth/seed" && req.method === "POST") return NextResponse.next();
@@ -55,12 +59,7 @@ export async function middleware(req: NextRequest) {
 
   // Root redirect
   if (pathname === "/") {
-    if (!session) return NextResponse.redirect(new URL("/login", req.url));
-    if (session.role === "super_admin" && !session.impersonatorId) {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    }
-    // Çift için default panel yönlendirmesi - slug olmadan
-    return NextResponse.redirect(new URL("/panel", req.url));
+    return NextResponse.next(); // Landing sayfasına izin ver
   }
 
   // Protected routes

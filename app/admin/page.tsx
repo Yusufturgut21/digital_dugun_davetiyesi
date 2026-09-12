@@ -13,6 +13,8 @@ interface DashboardData {
     activeUsers: number;
     totalRsvp: number;
     upcomingCount: number;
+    totalVenues: number;
+    activeVenues: number;
   };
   upcomingWeddings: { id: string; groomName: string; brideName: string; weddingDate: string; slug: string }[];
   recentCouples: { id: string; groomName: string; brideName: string; createdAt: string; slug: string }[];
@@ -58,6 +60,8 @@ export default function AdminDashboard() {
         <StatCard label="Toplam RSVP" value={stats.totalRsvp} />
         <StatCard label="Aktif Kullanıcı" value={stats.activeUsers} />
         <StatCard label="Yaklaşan Düğün" value={stats.upcomingCount} />
+        <StatCard label="Toplam Salon" value={stats.totalVenues} />
+        <StatCard label="Aktif Salon" value={stats.activeVenues} color="#4ade80" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">

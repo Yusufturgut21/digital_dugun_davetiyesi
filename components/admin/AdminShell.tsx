@@ -6,6 +6,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/couples", label: "Çiftler" },
   { href: "/admin/couples/new", label: "+ Yeni Çift" },
+  { href: "/admin/venues", label: "Düğün Salonları" },
   { href: "/admin/gallery", label: "Düğün Galerisi" },
   { href: "/admin/audit-logs", label: "Audit Log" },
 ];

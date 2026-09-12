@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "rm -rf .next && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create-sample-venue": "tsx scripts/create-sample-venue.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -27,6 +28,7 @@
     "autoprefixer": "^10",
     "postcss": "^8",
     "tailwindcss": "^3",
+    "tsx": "^4.7.1",
     "typescript": "^5"
   }
 }

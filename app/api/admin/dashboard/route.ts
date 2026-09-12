@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Invitation } from "@/lib/models/Invitation";
 import { User } from "@/lib/models/User";
 import { RSVP } from "@/lib/models/RSVP";
+import { VenueWebsite } from "@/lib/models/VenueWebsite";
 import { requireSuperAdmin, handleAuthError } from "@/lib/auth/authorization";
 
 export async function GET() {
@@ -18,6 +19,8 @@ export async function GET() {
       activeCouples,
       inactiveCouples,
       totalRsvp,
+      totalVenues,
+      activeVenues,
       upcomingWeddings,
       recentCouples,
     ] = await Promise.all([
@@ -25,6 +28,8 @@ export async function GET() {
       Invitation.countDocuments({ isActive: true }),
       Invitation.countDocuments({ isActive: false }),
       RSVP.countDocuments(),
+      VenueWebsite.countDocuments(),
+      VenueWebsite.countDocuments({ isActive: true }),
       Invitation.find({
         weddingDate: { $gte: now.toISOString().split("T")[0], $lte: thirtyDays.toISOString().split("T")[0] },
         isActive: true,
@@ -43,6 +48,8 @@ export async function GET() {
         activeUsers,
         totalRsvp,
         upcomingCount: upcomingWeddings.length,
+        totalVenues,
+        activeVenues,
       },
       upcomingWeddings: upcomingWeddings.map((inv) => ({
         id: inv._id.toString(),

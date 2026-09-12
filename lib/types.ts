@@ -119,3 +119,64 @@ export interface WeddingInvitation {
 }
 
 export type CreateInvitationInput = Omit<WeddingInvitation, "id" | "slug" | "createdAt" | "updatedAt">;
+
+// ========== DÜĞÜN SALONU WEB SİTESİ TYPES ==========
+
+export interface VenuePackage {
+  name: string;
+  description: string;
+  price?: string;
+  features: string[];
+  highlighted?: boolean;
+}
+
+export interface VenueFeature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface VenueWebsite {
+  id: string;
+  slug: string;
+
+  // Temel Bilgiler
+  venueName: string;
+  tagline: string; // Kısa tanıtım cümlesi
+  description: string; // Detaylı açıklama
+  
+  // İletişim
+  phone: string;
+  whatsapp: string;
+  email?: string;
+  address: string;
+  city: string;
+  district: string;
+  mapUrl?: string;
+  instagramUrl?: string;
+  
+  // Görseller
+  heroImage?: string; // Ana görsel
+  heroVideo?: string; // Ana video URL
+  galleryImages: string[]; // Salon galerisi
+  realWeddingImages: string[]; // Gerçek düğünlerden fotoğraflar
+  
+  // Özellikler
+  capacity: {
+    min: number;
+    max: number;
+  };
+  features: VenueFeature[];
+  packages: VenuePackage[];
+  
+  // SEO & Sosyal
+  metaTitle?: string;
+  metaDescription?: string;
+  
+  // Durum
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CreateVenueWebsiteInput = Omit<VenueWebsite, "id" | "slug" | "createdAt" | "updatedAt">;
