@@ -7,7 +7,8 @@
     "build": "rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint",
-    "create-sample-venue": "tsx scripts/create-sample-venue.ts"
+    "create-sample-venue": "tsx scripts/create-sample-venue.ts",
+    "create-belmond-venue": "tsx scripts/create-belmond-venue.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
