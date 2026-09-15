@@ -7,6 +7,7 @@ import { Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import ImageUpload from "./ImageUpload";
 import MultiImageUpload from "./MultiImageUpload";
+import VideoUpload from "./VideoUpload";
 
 interface Props {
   venueId?: string;
@@ -279,16 +280,11 @@ export default function VenueForm({ venueId }: Props) {
         />
 
         <div className="admin-field mt-6">
-          <label>Hero Video URL (Opsiyonel)</label>
-          <input
-            type="url"
+          <VideoUpload
+            label="Hero Video (Telefon veya Bilgisayardan)"
             value={venue.heroVideo}
-            onChange={(e) => setVenue({ ...venue, heroVideo: e.target.value })}
-            placeholder="https://example.com/video.mp4"
+            onChange={(url) => setVenue({ ...venue, heroVideo: url })}
           />
-          <p className="text-xs mt-1" style={{ color: "rgba(201,168,76,0.5)" }}>
-            Video varsa görsel yerine oynatılır
-          </p>
         </div>
 
         <div className="mt-6">
