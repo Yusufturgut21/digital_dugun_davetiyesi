@@ -11,6 +11,7 @@ import VenueMap from "./VenueMap";
 import VenueContact from "./VenueContact";
 import VenueInvitationPromo from "./VenueInvitationPromo";
 import LinaVenuePage from "./LinaVenuePage";
+import LaMerliVenuePage from "./LaMerliVenuePage";
 
 interface Props {
   slug: string;
@@ -56,6 +57,8 @@ export default function VenueWebsitePage({ slug }: Props) {
     <div className="min-h-screen bg-white">
       {slug === "lina-davet-florya" ? (
         <LinaVenuePage venue={venue} />
+      ) : slug === "la-merli-event-basaksehir" ? (
+        <LaMerliVenuePage venue={venue} />
       ) : (
         <>
           <VenueHero venue={venue} />
