@@ -272,13 +272,63 @@ function LinaHero({ venue }: Props) {
       </div>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/30 animate-bounce">
-        <ChevronDown className="w-5 h-5" />
-        <span className="text-xs tracking-widest uppercase">Keşfet</span>
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3">
+        <span className="text-white/70 text-xs tracking-[0.3em] uppercase font-light"
+          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>
+          Keşfet
+        </span>
+        {/* Mouse icon with animated dot */}
+        <div className="relative flex flex-col items-center gap-1">
+          <div
+            className="w-7 h-11 rounded-full border-2 flex justify-center pt-2"
+            style={{
+              borderColor: "rgba(255,255,255,0.55)",
+              background: "rgba(255,255,255,0.05)",
+              backdropFilter: "blur(4px)",
+              boxShadow: "0 0 20px rgba(56,178,204,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+            }}
+          >
+            <div
+              className="w-1 h-2 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.85)",
+                animation: "scrollDot 1.8s ease-in-out infinite",
+              }}
+            />
+          </div>
+          {/* Arrow chevrons */}
+          <div className="flex flex-col items-center -mt-0.5" style={{ gap: "2px" }}>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                style={{
+                  width: 10 + i * 4,
+                  height: 2,
+                  borderLeft: "2px solid rgba(255,255,255,0.7)",
+                  borderBottom: "2px solid rgba(255,255,255,0.7)",
+                  transform: "rotate(-45deg) skew(-5deg)",
+                  animation: `chevronFade 1.8s ease-in-out infinite`,
+                  animationDelay: `${i * 0.2}s`,
+                  borderRadius: "1px",
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       <style>{`
         @keyframes shimmer { 0%,100%{opacity:0.4} 50%{opacity:1} }
+        @keyframes scrollDot {
+          0% { transform: translateY(0); opacity: 1; }
+          60% { transform: translateY(10px); opacity: 0; }
+          61% { transform: translateY(0); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes chevronFade {
+          0%,100% { opacity: 0.2; }
+          50% { opacity: 0.9; }
+        }
       `}</style>
     </section>
   );
