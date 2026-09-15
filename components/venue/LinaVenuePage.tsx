@@ -548,6 +548,112 @@ function LinaContact({ venue }: Props) {
   );
 }
 
+/* ── GALLERY ─────────────────────────────────────────── */
+function LinaGallery({ venue }: Props) {
+  const [selected, setSelected] = useState<number | null>(null);
+  const ref = useRef<HTMLElement>(null!);
+  const visible = useInView(ref);
+
+  const allImages = [
+    ...(venue.galleryImages || []),
+    ...(venue.realWeddingImages || []),
+  ];
+
+  if (allImages.length === 0) return null;
+
+  const prev = () => setSelected((s) => s !== null ? (s - 1 + allImages.length) % allImages.length : 0);
+  const next = () => setSelected((s) => s !== null ? (s + 1) % allImages.length : 0);
+
+  return (
+    <section ref={ref} className="py-16 sm:py-24 px-4 sm:px-6"
+      style={{ background: `linear-gradient(180deg, ${OCEAN.sand} 0%, #eef6f9 100%)` }}>
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12 transition-all duration-700"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}>
+          <p className="text-xs tracking-[0.35em] uppercase font-semibold mb-4" style={{ color: OCEAN.aqua }}>Galeri</p>
+          <h2 className="font-serif mb-3" style={{ fontSize: "clamp(2rem,5vw,3.5rem)", color: OCEAN.deep }}>
+            Salonumuzdan Kareler
+          </h2>
+          <div className="w-12 h-0.5 mx-auto rounded-full" style={{ background: `linear-gradient(90deg,${OCEAN.teal},${OCEAN.light})` }} />
+        </div>
+
+        {/* Masonry-style grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+          {allImages.map((img, i) => (
+            <div
+              key={i}
+              onClick={() => setSelected(i)}
+              className="relative overflow-hidden rounded-xl cursor-pointer group transition-all duration-500"
+              style={{
+                aspectRatio: i % 7 === 0 ? "1/1.3" : i % 5 === 2 ? "1.3/1" : "1/1",
+                gridRow: i % 7 === 0 ? "span 1" : "span 1",
+                opacity: visible ? 1 : 0,
+                transitionDelay: `${i * 40}ms`,
+              }}
+            >
+              <img
+                src={img}
+                alt={`${venue.venueName} ${i + 1}`}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100 flex items-end p-3"
+                style={{ background: "linear-gradient(to top, rgba(2,13,26,0.7), transparent)" }}>
+                <span className="text-white text-xs font-medium">{i + 1} / {allImages.length}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {selected !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(2,13,26,0.96)", backdropFilter: "blur(8px)" }}
+          onClick={() => setSelected(null)}
+        >
+          {/* Close */}
+          <button
+            onClick={() => setSelected(null)}
+            className="absolute top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all hover:bg-white/10"
+            style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+          >
+            ✕
+          </button>
+          {/* Prev */}
+          <button
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all hover:bg-white/10"
+            style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+          >
+            ‹
+          </button>
+          {/* Next */}
+          <button
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all hover:bg-white/10"
+            style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+          >
+            ›
+          </button>
+          {/* Counter */}
+          <div className="absolute top-5 left-5 px-3 py-1.5 rounded-full text-white text-xs"
+            style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}>
+            {selected + 1} / {allImages.length}
+          </div>
+          <img
+            src={allImages[selected]}
+            alt="Büyük görsel"
+            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            style={{ boxShadow: "0 30px 80px rgba(0,0,0,0.6)" }}
+          />
+        </div>
+      )}
+    </section>
+  );
+}
+
 /* ── EXPORT ───────────────────────────────────────────── */
 export default function LinaVenuePage({ venue }: Props) {
   return (
@@ -556,9 +662,11 @@ export default function LinaVenuePage({ venue }: Props) {
       <LinaHero venue={venue} />
       <TaglineStrip />
       <LinaAbout venue={venue} />
+      <LinaGallery venue={venue} />
       <LinaFeatures venue={venue} />
       <LinaPackages venue={venue} />
       <LinaContact venue={venue} />
     </div>
   );
 }
+
