@@ -86,13 +86,25 @@ function FloatingNav({ venue }: Props) {
 }
 
 /* ── HERO ────────────────────────────────────────────── */
+
+// Pexels lisanssız stok deniz videoları — CDN direkt, indirme gerekmez
+const OCEAN_VIDEOS = [
+  "https://videos.pexels.com/video-files/1409899/1409899-uhd_2560_1440_25fps.mp4",   // sakin deniz yüzeyi, günbatımı
+  "https://videos.pexels.com/video-files/857611/857611-hd_1920_1080_25fps.mp4",      // yedek: dalgalar
+];
+
 function LinaHero({ venue }: Props) {
   const scrollY = useScrollY();
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  // Admin'den girilmişse önce onu kullan, yoksa stok video
+  const videoSrc = venue.heroVideo || OCEAN_VIDEOS[0];
 
   return (
     <section className="relative h-screen min-h-[680px] overflow-hidden flex items-center justify-center">
 
-      {/* Sky gradient — upper half */}
+      {/* ── BACKGROUND: Video (önce) → heroImage → gradient ── */}
+
+      {/* Gradient her zaman en altta — video yüklenene kadar görünür */}
       <div className="absolute inset-0" style={{
         background: `linear-gradient(180deg,
           ${OCEAN.deep} 0%,
@@ -105,41 +117,89 @@ function LinaHero({ venue }: Props) {
           #2aa8cc 100%)`
       }} />
 
-      {/* Subtle light rays from upper-right */}
+      {/* Hero image fallback (admin'den yüklendiyse) */}
+      {venue.heroImage && !videoLoaded && (
+        <div className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${venue.heroImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+      )}
+
+      {/* Video arka plan */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        onCanPlay={() => setVideoLoaded(true)}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+        style={{
+          opacity: videoLoaded ? 1 : 0,
+          transform: `scale(1.04) translateY(${scrollY * 0.08}px)`,
+        }}
+      >
+        <source src={videoSrc} type="video/mp4" />
+        <source src={OCEAN_VIDEOS[1]} type="video/mp4" />
+      </video>
+
+      {/* Sinematik overlay — videoyu premium gösterir, kontrast sağlar */}
+      <div className="absolute inset-0" style={{
+        background: `linear-gradient(
+          180deg,
+          rgba(2,13,26,0.62) 0%,
+          rgba(4,18,36,0.38) 30%,
+          rgba(6,22,44,0.22) 55%,
+          rgba(8,28,56,0.42) 78%,
+          rgba(2,13,26,0.75) 100%
+        )`
+      }} />
+
+      {/* Işık kırınımı — sol üstten hafif mavi halo */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 70% 50% at 20% 10%, rgba(56,178,204,0.12) 0%, transparent 70%)",
+        }}
+      />
+
+      {/* Subtle shimmer rays */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[20, 38, 56, 74].map((left, i) => (
+        {[20, 50, 80].map((left, i) => (
           <div key={i} className="absolute top-0 h-full"
             style={{
               left: `${left}%`,
-              width: `${60 + i * 40}px`,
-              background: `linear-gradient(180deg, rgba(180,230,255,${0.025 + i * 0.008}) 0%, transparent 70%)`,
-              transform: `skewX(${-8 + i * 3}deg)`,
-              animation: `shimmer ${7 + i * 2}s ease-in-out infinite`,
-              animationDelay: `${i * 1.8}s`,
+              width: `${80 + i * 50}px`,
+              background: `linear-gradient(180deg, rgba(200,235,255,${0.018 + i * 0.006}) 0%, transparent 60%)`,
+              transform: `skewX(${-6 + i * 4}deg)`,
+              animation: `shimmer ${8 + i * 3}s ease-in-out infinite`,
+              animationDelay: `${i * 2.2}s`,
             }}
           />
         ))}
       </div>
 
-      {/* ── OCEAN CANVAS — bottom 55% of hero ── */}
+      {/* ── OCEAN CANVAS — deniz Canvas animasyonu video üzerine bindirme ── */}
       <OceanCanvas
         className="absolute left-0 right-0 bottom-0 pointer-events-none"
-        style={{ height: "58%", width: "100%" }}
+        style={{ height: "42%", width: "100%", opacity: videoLoaded ? 0.55 : 1 }}
       />
 
       {/* Horizon glow where sky meets sea */}
       <div className="absolute pointer-events-none"
         style={{
           left: 0, right: 0,
-          bottom: "54%",
-          height: "80px",
-          background: "linear-gradient(180deg, transparent 0%, rgba(40,170,210,0.18) 50%, transparent 100%)",
-          filter: "blur(12px)",
+          bottom: "38%",
+          height: "60px",
+          background: "linear-gradient(180deg, transparent 0%, rgba(40,170,210,0.12) 50%, transparent 100%)",
+          filter: "blur(14px)",
         }}
       />
 
-      {/* Sand/shore fade at very bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+      {/* Shore fade at very bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
         style={{ background: `linear-gradient(180deg, transparent, ${OCEAN.sand})` }} />
 
 
