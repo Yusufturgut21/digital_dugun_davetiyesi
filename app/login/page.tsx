@@ -43,12 +43,6 @@ export default function LoginPage() {
             style={{ background: "linear-gradient(135deg, #C9A84C, #E8D5A3)" }}>
             <span className="text-xl">✦</span>
           </div>
-          <h1 className="font-serif text-2xl font-light mb-1" style={{ color: "#E8D5A3" }}>
-            Sahra Düğün Salonu
-          </h1>
-          <p className="font-sans text-xs tracking-widest uppercase" style={{ color: "rgba(201,168,76,0.5)" }}>
-            Dijital Davetiye Yönetimi
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
