@@ -1,163 +1,316 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { VenueWebsite } from "@/lib/types";
-import { MessageCircle, Phone, MapPin, Check, ChevronDown, Instagram, Sparkles, Waves, Anchor, Wind } from "lucide-react";
+import {
+  MessageCircle, Phone, MapPin, Check, ChevronDown,
+  Instagram, Sparkles, Star, Users, Award, ArrowRight
+} from "lucide-react";
 
-interface Props {
-  venue: VenueWebsite;
+interface Props { venue: VenueWebsite; }
+
+const OCEAN = {
+  deep: "#020d1a",
+  navy: "#061428",
+  mid: "#0a2540",
+  teal: "#0d4f6e",
+  aqua: "#1a7fa0",
+  light: "#38b2cc",
+  foam: "#a8e6f0",
+  sand: "#f5efe6",
+  gold: "#c9a84c",
+};
+
+/* ── utility ─────────────────────────────────────────── */
+function useScrollY() {
+  const [y, setY] = useState(0);
+  useEffect(() => {
+    const fn = () => setY(window.scrollY);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+  return y;
 }
 
-// ─── HERO ─────────────────────────────────────────────────────────────────────
-function LinaHero({ venue }: Props) {
-  const [scrollY, setScrollY] = useState(0);
+function useInView(ref: React.RefObject<HTMLElement>) {
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const handler = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.15 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [ref]);
+  return visible;
+}
+
+function wa(venue: VenueWebsite, msg?: string) {
+  const text = msg ?? `Merhaba, ${venue.venueName} hakkında bilgi almak istiyorum.`;
+  window.open(`https://wa.me/${venue.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`, "_blank");
+}
+
+/* ── FLOATING NAV ────────────────────────────────────── */
+function FloatingNav({ venue }: Props) {
+  const scrollY = useScrollY();
+  const show = scrollY > 80;
+  return (
+    <nav
+      className="fixed top-4 left-1/2 z-50 transition-all duration-500"
+      style={{
+        transform: `translateX(-50%) translateY(${show ? 0 : -100}px)`,
+        opacity: show ? 1 : 0,
+        pointerEvents: show ? "auto" : "none",
+      }}
+    >
+      <div
+        className="flex items-center gap-3 px-5 py-3 rounded-full border"
+        style={{
+          background: "rgba(2,13,26,0.75)",
+          backdropFilter: "blur(20px)",
+          borderColor: "rgba(56,178,204,0.25)",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+        }}
+      >
+        <span className="font-serif text-white text-sm tracking-wide">Lina Davet</span>
+        <span className="w-px h-4 bg-white/20" />
+        <span className="text-cyan-300 text-xs tracking-widest uppercase">Florya</span>
+        <span className="w-px h-4 bg-white/20" />
+        <button
+          onClick={() => wa(venue)}
+          className="flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-full transition-all hover:scale-105"
+          style={{ background: "linear-gradient(135deg,#25D366,#128C7E)", color: "#fff" }}
+        >
+          <MessageCircle className="w-3.5 h-3.5" /> Yaz
+        </button>
+      </div>
+    </nav>
+  );
+}
+
+/* ── HERO ────────────────────────────────────────────── */
+function LinaHero({ venue }: Props) {
+  const scrollY = useScrollY();
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 60);
+    return () => clearInterval(id);
   }, []);
 
-  const wa = () => {
-    window.open(`https://wa.me/${venue.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(`Merhaba, ${venue.venueName} hakkında bilgi almak istiyorum.`)}`, "_blank");
-  };
-
   return (
-    <section className="relative h-screen min-h-[700px] flex items-end overflow-hidden">
-      {/* Animated ocean gradient background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(160deg, #0a1628 0%, #0d2744 25%, #0e3d6e 50%, #1a6b8a 75%, #2d9eb5 100%)",
-          transform: `scale(1.05) translateY(${scrollY * 0.2}px)`,
-        }}
-      />
+    <section className="relative h-screen min-h-[680px] overflow-hidden flex items-center justify-center">
 
-      {/* Wave layers */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
-        <svg viewBox="0 0 1440 200" className="w-full" style={{ transform: `translateY(${scrollY * 0.1}px)` }}>
-          <path fill="rgba(255,255,255,0.04)" d="M0,80 C360,140 720,20 1080,100 C1260,140 1380,60 1440,80 L1440,200 L0,200 Z" />
-        </svg>
-        <svg viewBox="0 0 1440 160" className="w-full absolute bottom-0" style={{ transform: `translateY(${scrollY * 0.05}px)` }}>
-          <path fill="rgba(255,255,255,0.06)" d="M0,60 C180,100 360,20 540,80 C720,140 900,20 1080,60 C1260,100 1380,40 1440,60 L1440,160 L0,160 Z" />
-        </svg>
-        <svg viewBox="0 0 1440 120" className="w-full absolute bottom-0">
-          <path fill="rgba(255,255,255,0.08)" d="M0,40 C240,80 480,0 720,40 C960,80 1200,10 1440,40 L1440,120 L0,120 Z" />
-        </svg>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-white" />
-      </div>
+      {/* Deep ocean background */}
+      <div className="absolute inset-0" style={{ background: `linear-gradient(175deg, ${OCEAN.deep} 0%, ${OCEAN.navy} 30%, ${OCEAN.mid} 60%, ${OCEAN.teal} 85%, ${OCEAN.aqua} 100%)` }} />
 
-      {/* Floating particles */}
+      {/* Animated shimmer light rays */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white/10"
+        {[15, 35, 55, 72, 88].map((left, i) => (
+          <div key={i} className="absolute top-0 bottom-0 w-px"
             style={{
-              width: `${4 + (i % 4) * 6}px`,
-              height: `${4 + (i % 4) * 6}px`,
-              left: `${(i * 8.33) + 2}%`,
-              top: `${20 + (i % 5) * 12}%`,
-              animation: `float ${4 + (i % 3)}s ease-in-out infinite`,
-              animationDelay: `${i * 0.4}s`,
+              left: `${left}%`,
+              background: `linear-gradient(180deg, transparent 0%, rgba(56,178,204,${0.04 + (i % 3) * 0.02}) 40%, transparent 100%)`,
+              transform: `scaleX(${8 + (i % 4) * 6}) skewX(${-2 + i}deg)`,
+              animation: `shimmer ${6 + i}s ease-in-out infinite`,
+              animationDelay: `${i * 1.2}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full px-6 pb-32 md:pb-40">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-8 border border-white/20 backdrop-blur-sm bg-white/5">
-            <Waves className="w-4 h-4 text-cyan-300" />
-            <span className="text-white/80 text-sm tracking-widest uppercase">Florya · İstanbul</span>
-            <Anchor className="w-4 h-4 text-cyan-300" />
-          </div>
+      {/* Parallax bubbles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 18 }).map((_, i) => {
+          const size = 4 + (i % 5) * 5;
+          return (
+            <div key={i} className="absolute rounded-full"
+              style={{
+                width: size, height: size,
+                left: `${5 + (i * 5.5) % 90}%`,
+                top: `${10 + (i * 7.3) % 75}%`,
+                background: `radial-gradient(circle at 35% 35%, rgba(168,230,240,0.4), rgba(56,178,204,0.1))`,
+                border: "1px solid rgba(168,230,240,0.2)",
+                transform: `translateY(${scrollY * (0.05 + (i % 4) * 0.03) * -1}px)`,
+                animation: `rise ${5 + (i % 4)}s ease-in-out infinite`,
+                animationDelay: `${(i * 0.6) % 5}s`,
+              }}
+            />
+          );
+        })}
+      </div>
 
-          <h1
-            className="font-serif mb-6 leading-none text-white"
-            style={{ fontSize: "clamp(3rem, 9vw, 8rem)", textShadow: "0 4px 40px rgba(0,0,0,0.4)" }}
-          >
-            Lina Davet
-          </h1>
+      {/* Animated wave SVG layers */}
+      <div className="absolute bottom-0 left-0 w-full">
+        <svg viewBox="0 0 1440 300" className="w-full" preserveAspectRatio="none"
+          style={{ transform: `translateY(${scrollY * 0.15}px)` }}>
+          <defs>
+            <linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={OCEAN.aqua} stopOpacity="0.15" />
+              <stop offset="100%" stopColor={OCEAN.aqua} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#wg1)" d={`M0,180 C${240 + Math.sin(tick * 0.02) * 30},${120 + Math.cos(tick * 0.015) * 20} ${480},${200 + Math.sin(tick * 0.018 + 1) * 25} ${720},${160 + Math.cos(tick * 0.02 + 2) * 20} C${960},${120 + Math.sin(tick * 0.016 + 3) * 25} ${1200},${190 + Math.cos(tick * 0.019) * 20} 1440,170 L1440,300 L0,300 Z`} />
+        </svg>
+        <svg viewBox="0 0 1440 200" className="w-full absolute bottom-0" preserveAspectRatio="none">
+          <path fill={OCEAN.sand} d={`M0,120 C${360 + Math.sin(tick * 0.025) * 20},${60 + Math.cos(tick * 0.02) * 15} ${720},${140 + Math.sin(tick * 0.022) * 20} ${1080},${80 + Math.cos(tick * 0.018) * 15} C${1260},${110 + Math.sin(tick * 0.02) * 12} ${1380},${90} 1440,100 L1440,200 L0,200 Z`} />
+        </svg>
+      </div>
 
-          <p className="text-lg sm:text-2xl md:text-3xl font-light mb-2 text-cyan-200" style={{ letterSpacing: "0.15em" }}>
-            FLORYA
-          </p>
+      {/* CONTENT */}
+      <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 mb-8"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(168,230,240,0.2)",
+            borderRadius: 999,
+            padding: "6px 20px",
+          }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="text-cyan-200 text-xs tracking-[0.3em] uppercase font-light">Florya · İstanbul · Deniz Kenarı</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+        </div>
 
-          <p className="text-base sm:text-xl text-white/70 mb-12 font-light max-w-2xl mx-auto leading-relaxed">
-            {venue.tagline}
-          </p>
+        {/* Main title */}
+        <h1 style={{
+          fontFamily: "Georgia, serif",
+          fontSize: "clamp(3.5rem,11vw,9.5rem)",
+          lineHeight: 0.9,
+          color: "#fff",
+          textShadow: `0 0 80px rgba(56,178,204,0.3), 0 4px 60px rgba(0,0,0,0.5)`,
+          letterSpacing: "-0.02em",
+          marginBottom: "1rem",
+        }}>
+          Lina<br />
+          <span style={{ color: OCEAN.foam, opacity: 0.9 }}>Davet</span>
+        </h1>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={wa}
-              className="flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold text-base transition-all duration-300 hover:scale-105 shadow-2xl"
-              style={{ background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#fff" }}
-            >
-              <MessageCircle className="w-5 h-5" />
-              WhatsApp ile Yaz
-            </button>
-            <a
-              href={`tel:${venue.phone}`}
-              className="flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-white/30 bg-white/10 text-white hover:bg-white/20"
-            >
-              <Phone className="w-5 h-5" />
-              {venue.phone}
-            </a>
-          </div>
+        <p style={{
+          color: "rgba(168,230,240,0.7)",
+          fontSize: "clamp(0.75rem,2vw,1rem)",
+          letterSpacing: "0.5em",
+          textTransform: "uppercase",
+          marginBottom: "1.5rem",
+          fontWeight: 300,
+        }}>
+          FLORYA
+        </p>
+
+        <p style={{
+          color: "rgba(255,255,255,0.55)",
+          fontSize: "clamp(1rem,2.5vw,1.25rem)",
+          maxWidth: 520,
+          margin: "0 auto 3rem",
+          lineHeight: 1.7,
+          fontWeight: 300,
+        }}>
+          {venue.tagline}
+        </p>
+
+        {/* CTA */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button onClick={() => wa(venue)}
+            className="group flex items-center justify-center gap-3 font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: "linear-gradient(135deg,#25D366,#128C7E)",
+              color: "#fff", padding: "16px 36px", borderRadius: 999,
+              fontSize: "1rem",
+              boxShadow: "0 8px 32px rgba(37,211,102,0.35)",
+            }}>
+            <MessageCircle className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+            WhatsApp ile Yaz
+          </button>
+          <a href={`tel:${venue.phone}`}
+            className="flex items-center justify-center gap-3 font-semibold transition-all duration-300 hover:scale-105"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              backdropFilter: "blur(16px)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              color: "#fff", padding: "16px 36px", borderRadius: 999,
+              fontSize: "1rem",
+            }}>
+            <Phone className="w-5 h-5" />
+            {venue.phone}
+          </a>
         </div>
       </div>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-white/40 animate-bounce">
-        <ChevronDown className="w-6 h-6" />
+      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/30 animate-bounce">
+        <ChevronDown className="w-5 h-5" />
+        <span className="text-xs tracking-widest uppercase">Keşfet</span>
       </div>
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); opacity: 0.6; }
-          50% { transform: translateY(-20px); opacity: 1; }
-        }
+        @keyframes shimmer { 0%,100%{opacity:0.5} 50%{opacity:1} }
+        @keyframes rise { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-18px) scale(1.1)} }
       `}</style>
     </section>
   );
 }
 
-// ─── ABOUT ────────────────────────────────────────────────────────────────────
-function LinaAbout({ venue }: Props) {
+/* ── TAGLINE STRIP ───────────────────────────────────── */
+function TaglineStrip() {
+  const tags = ["🌊 Deniz Manzarası","✨ Premium Hizmet","💍 800 Kişi Kapasitesi","🎵 Canlı Müzik","🍽️ Gala Menüsü","📸 VIP Lounge","🚗 Ücretsiz Otopark","⭐ 15+ Yıl Tecrübe"];
+  const doubled = [...tags, ...tags];
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
+    <div className="overflow-hidden py-4 border-y" style={{ background: OCEAN.sand, borderColor: "rgba(201,168,76,0.15)" }}>
+      <div className="flex gap-8 whitespace-nowrap" style={{ animation: "marquee 28s linear infinite" }}>
+        {doubled.map((t, i) => (
+          <span key={i} className="text-sm font-medium shrink-0" style={{ color: OCEAN.teal }}>{t}</span>
+        ))}
+      </div>
+      <style>{`@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }`}</style>
+    </div>
+  );
+}
+
+/* ── ABOUT ───────────────────────────────────────────── */
+function LinaAbout({ venue }: Props) {
+  const ref = useRef<HTMLElement>(null!);
+  const visible = useInView(ref);
+  const stats = [
+    { icon: <Star className="w-6 h-6" />, val: "15+", label: "Yıl Tecrübe" },
+    { icon: <Users className="w-6 h-6" />, val: "1000+", label: "Mutlu Çift" },
+    { icon: <Award className="w-6 h-6" />, val: `${venue.capacity.max}`, label: "Kişi Kapasitesi" },
+    { icon: <Sparkles className="w-6 h-6" />, val: "100%", label: "Memnuniyet" },
+  ];
+  return (
+    <section ref={ref} className="relative py-20 sm:py-32 px-4 sm:px-6 overflow-hidden" style={{ background: OCEAN.sand }}>
+      {/* Decorative circle */}
+      <div className="absolute -right-32 -top-32 w-96 h-96 rounded-full opacity-10 pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${OCEAN.aqua}, transparent)` }} />
+
       <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <span className="inline-block text-cyan-600 text-sm font-medium tracking-widest uppercase mb-4">
-              Hakkımızda
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-gray-900 mb-6 leading-tight">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+          {/* Text */}
+          <div className="transition-all duration-1000" style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateX(-40px)" }}>
+            <p className="text-xs tracking-[0.35em] uppercase font-semibold mb-5" style={{ color: OCEAN.aqua }}>Hakkımızda</p>
+            <h2 className="font-serif mb-6 leading-tight" style={{ fontSize: "clamp(2rem,5vw,3.5rem)", color: OCEAN.deep }}>
               Denizin Kıyısında<br />
-              <span style={{ color: "#0e3d6e" }}>Sonsuz Bir Gün</span>
+              <em style={{ color: OCEAN.teal, fontStyle: "italic" }}>Sonsuz Bir Gün</em>
             </h2>
-            <div className="w-16 h-1 rounded-full mb-8" style={{ background: "linear-gradient(90deg, #0e3d6e, #2d9eb5)" }} />
-            <p className="text-gray-600 text-base sm:text-lg leading-relaxed whitespace-pre-line">
+            <div className="w-12 h-0.5 mb-8 rounded-full" style={{ background: `linear-gradient(90deg,${OCEAN.teal},${OCEAN.light})` }} />
+            <p className="leading-relaxed whitespace-pre-line" style={{ color: "#4a5568", fontSize: "1.0625rem" }}>
               {venue.description}
             </p>
+            <button onClick={() => wa(venue)}
+              className="mt-10 group inline-flex items-center gap-3 font-semibold text-sm transition-all hover:gap-5"
+              style={{ color: OCEAN.teal }}>
+              Rezervasyon Yap
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { icon: "🌊", val: "15+", label: "Yıl Tecrübe" },
-              { icon: "💍", val: "1000+", label: "Mutlu Çift" },
-              { icon: "👥", val: `${venue.capacity.min}-${venue.capacity.max}`, label: "Kişi Kapasitesi" },
-              { icon: "⭐", val: "100%", label: "Memnuniyet" },
-            ].map((s, i) => (
-              <div
-                key={i}
-                className="rounded-2xl p-6 text-center"
-                style={{ background: i % 2 === 0 ? "linear-gradient(135deg, #f0f9ff, #e0f2fe)" : "linear-gradient(135deg, #f8fafc, #f1f5f9)" }}
-              >
-                <div className="text-3xl mb-2">{s.icon}</div>
-                <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: "#0e3d6e" }}>{s.val}</div>
-                <div className="text-xs text-gray-500">{s.label}</div>
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-4 transition-all duration-1000 delay-200" style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateX(40px)" }}>
+            {stats.map((s, i) => (
+              <div key={i} className="rounded-2xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl"
+                style={{
+                  background: i % 2 === 0 ? `linear-gradient(135deg,${OCEAN.mid},${OCEAN.teal})` : "#fff",
+                  boxShadow: "0 4px 24px rgba(10,37,64,0.08)",
+                }}>
+                <div className="mb-3" style={{ color: i % 2 === 0 ? OCEAN.foam : OCEAN.teal }}>{s.icon}</div>
+                <div className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: i % 2 === 0 ? "#fff" : OCEAN.deep }}>{s.val}</div>
+                <div className="text-xs tracking-wide" style={{ color: i % 2 === 0 ? "rgba(255,255,255,0.6)" : "#718096" }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -167,44 +320,61 @@ function LinaAbout({ venue }: Props) {
   );
 }
 
-// ─── FEATURES ─────────────────────────────────────────────────────────────────
+/* ── FEATURES ────────────────────────────────────────── */
 function LinaFeatures({ venue }: Props) {
+  const ref = useRef<HTMLElement>(null!);
+  const visible = useInView(ref);
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden"
-      style={{ background: "linear-gradient(160deg, #0a1628 0%, #0d2744 60%, #0e3d6e 100%)" }}>
-      {/* Decorative waves */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
-        <svg viewBox="0 0 1440 80" className="w-full">
-          <path fill="white" d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,20 1440,40 L1440,80 L0,80 Z" />
+    <section ref={ref} className="relative py-20 sm:py-32 px-4 sm:px-6 overflow-hidden"
+      style={{ background: `linear-gradient(175deg, ${OCEAN.deep} 0%, ${OCEAN.navy} 50%, ${OCEAN.mid} 100%)` }}>
+
+      {/* Top wave */}
+      <div className="absolute top-0 left-0 w-full overflow-hidden">
+        <svg viewBox="0 0 1440 80" className="w-full" preserveAspectRatio="none" style={{ transform: "rotate(180deg)" }}>
+          <path fill={OCEAN.sand} d="M0,40 C360,80 720,0 1080,50 C1260,70 1380,20 1440,40 L1440,80 L0,80 Z" />
         </svg>
       </div>
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
-        <svg viewBox="0 0 1440 80" className="w-full">
-          <path fill="white" d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,20 1440,40 L1440,80 L0,80 Z" />
+      {/* Bottom wave */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden">
+        <svg viewBox="0 0 1440 80" className="w-full" preserveAspectRatio="none">
+          <path fill={OCEAN.sand} d="M0,40 C360,80 720,0 1080,50 C1260,70 1380,20 1440,40 L1440,80 L0,80 Z" />
         </svg>
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10 pt-8 pb-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <span className="inline-flex items-center gap-2 text-cyan-300 text-sm font-medium tracking-widest uppercase mb-4">
-            <Wind className="w-4 h-4" /> Özelliklerimiz
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white mb-4">
+      {/* Glow blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-10" style={{ background: OCEAN.aqua, filter: "blur(80px)" }} />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full opacity-8" style={{ background: OCEAN.light, filter: "blur(80px)" }} />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10 py-8">
+        <div className="text-center mb-16 transition-all duration-700" style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}>
+          <p className="text-xs tracking-[0.35em] uppercase font-semibold mb-4" style={{ color: OCEAN.foam }}>Özelliklerimiz</p>
+          <h2 className="font-serif text-white mb-3" style={{ fontSize: "clamp(2rem,5vw,3.5rem)" }}>
             Neden Lina Davet?
           </h2>
-          <div className="w-16 h-1 rounded-full mx-auto" style={{ background: "linear-gradient(90deg, #2d9eb5, #67e8f9)" }} />
+          <div className="w-12 h-0.5 mx-auto rounded-full" style={{ background: `linear-gradient(90deg,${OCEAN.light},${OCEAN.foam})` }} />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {venue.features.map((f, i) => (
-            <div
-              key={i}
-              className="rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border border-white/5"
-              style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(12px)" }}
-            >
-              <div className="text-3xl sm:text-4xl mb-4">{f.icon}</div>
-              <h3 className="text-white font-semibold text-base sm:text-lg mb-2">{f.title}</h3>
-              <p className="text-white/60 text-sm leading-relaxed">{f.description}</p>
+            <div key={i}
+              className="group rounded-2xl p-6 transition-all duration-500 hover:-translate-y-2 cursor-default"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(16px)",
+                border: "1px solid rgba(56,178,204,0.12)",
+                opacity: visible ? 1 : 0,
+                transform: visible ? "none" : "translateY(30px)",
+                transitionDelay: `${i * 60}ms`,
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+              }}>
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">{f.icon}</div>
+              <h3 className="font-semibold text-white text-base mb-2">{f.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(168,230,240,0.55)" }}>{f.description}</p>
+              {/* Bottom accent */}
+              <div className="mt-4 h-px rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: `linear-gradient(90deg,${OCEAN.light},transparent)` }} />
             </div>
           ))}
         </div>
@@ -213,174 +383,188 @@ function LinaFeatures({ venue }: Props) {
   );
 }
 
-// ─── PACKAGES ─────────────────────────────────────────────────────────────────
+/* ── PACKAGES ────────────────────────────────────────── */
 function LinaPackages({ venue }: Props) {
-  const wa = (pkg?: string) => {
-    const msg = pkg
-      ? `Merhaba, "${pkg}" paketi hakkında bilgi almak istiyorum.`
-      : "Merhaba, düğün paketleriniz hakkında bilgi almak istiyorum.";
-    window.open(`https://wa.me/${venue.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`, "_blank");
-  };
+  const ref = useRef<HTMLElement>(null!);
+  const visible = useInView(ref);
 
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
+    <section ref={ref} className="py-20 sm:py-32 px-4 sm:px-6" style={{ background: OCEAN.sand }}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12 sm:mb-16">
-          <span className="inline-block text-cyan-600 text-sm font-medium tracking-widest uppercase mb-4">Paketler</span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-gray-900 mb-4">Düğün Paketlerimiz</h2>
-          <p className="text-gray-500 max-w-xl mx-auto">Her düğün özeldir. Sizin için en uygun paketi birlikte belirleyelim.</p>
+        <div className="text-center mb-16 transition-all duration-700" style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}>
+          <p className="text-xs tracking-[0.35em] uppercase font-semibold mb-4" style={{ color: OCEAN.aqua }}>Paketler</p>
+          <h2 className="font-serif mb-3" style={{ fontSize: "clamp(2rem,5vw,3.5rem)", color: OCEAN.deep }}>Düğün Paketlerimiz</h2>
+          <p className="text-gray-500 max-w-md mx-auto text-sm">Her düğün özeldir. En uygun paketi birlikte belirleyelim.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-start">
-          {venue.packages.map((pkg, i) => (
-            <div
-              key={i}
-              className={`rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl ${pkg.highlighted ? "ring-2 shadow-2xl scale-105" : ""}`}
-              style={pkg.highlighted ? { ringColor: "#2d9eb5" } : {}}
-            >
-              {pkg.highlighted && (
-                <div className="py-3 text-center text-white text-sm font-bold tracking-wider flex items-center justify-center gap-2"
-                  style={{ background: "linear-gradient(90deg, #0e3d6e, #2d9eb5)" }}>
-                  <Sparkles className="w-4 h-4" /> EN POPÜLER
-                </div>
-              )}
-              <div className="p-6 sm:p-8 border border-gray-100 rounded-b-3xl" style={pkg.highlighted ? { borderColor: "#bae6fd" } : {}}>
-                <h3 className="font-serif text-2xl sm:text-3xl mb-2" style={{ color: "#0e3d6e" }}>{pkg.name}</h3>
-                <p className="text-gray-500 text-sm mb-6">{pkg.description}</p>
-                <ul className="space-y-3 mb-8">
-                  {pkg.features.map((feat, fi) => (
-                    <li key={fi} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{ background: "linear-gradient(135deg, #0e3d6e, #2d9eb5)" }}>
-                        <Check className="w-3 h-3 text-white" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          {venue.packages.map((pkg, i) => {
+            const isHot = pkg.highlighted;
+            return (
+              <div key={i}
+                className="relative rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
+                style={{
+                  background: isHot ? `linear-gradient(160deg,${OCEAN.mid},${OCEAN.teal})` : "#fff",
+                  boxShadow: isHot ? `0 20px 60px rgba(13,79,110,0.4)` : "0 4px 24px rgba(10,37,64,0.08)",
+                  transform: isHot ? "scale(1.03)" : "scale(1)",
+                  opacity: visible ? 1 : 0,
+                  transitionDelay: `${i * 100}ms`,
+                }}>
+
+                {isHot && (
+                  <div className="absolute top-0 left-0 right-0 py-2 text-center text-xs font-bold tracking-widest uppercase"
+                    style={{ background: OCEAN.gold, color: OCEAN.deep }}>
+                    ✦ En Popüler ✦
+                  </div>
+                )}
+
+                <div className="p-7 sm:p-8" style={{ paddingTop: isHot ? "3rem" : undefined }}>
+                  <h3 className="font-serif text-2xl sm:text-3xl mb-1" style={{ color: isHot ? "#fff" : OCEAN.deep }}>
+                    {pkg.name}
+                  </h3>
+                  <p className="text-sm mb-6" style={{ color: isHot ? "rgba(255,255,255,0.55)" : "#718096" }}>{pkg.description}</p>
+
+                  <div className="space-y-2.5 mb-8">
+                    {pkg.features.map((feat, fi) => (
+                      <div key={fi} className="flex items-start gap-3">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                          style={{ background: isHot ? "rgba(255,255,255,0.15)" : `linear-gradient(135deg,${OCEAN.teal},${OCEAN.light})` }}>
+                          <Check className="w-3 h-3" style={{ color: isHot ? OCEAN.foam : "#fff" }} />
+                        </div>
+                        <span className="text-sm" style={{ color: isHot ? "rgba(255,255,255,0.8)" : "#4a5568" }}>{feat}</span>
                       </div>
-                      <span className="text-gray-600 text-sm">{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => wa(pkg.name)}
-                  className="w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-105"
-                  style={pkg.highlighted
-                    ? { background: "linear-gradient(135deg, #0e3d6e, #2d9eb5)", color: "#fff" }
-                    : { background: "#f0f9ff", color: "#0e3d6e", border: "1.5px solid #bae6fd" }}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Bilgi Al
-                </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => wa(venue, `Merhaba, "${pkg.name}" paketi hakkında bilgi almak istiyorum.`)}
+                    className="w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02] hover:shadow-lg"
+                    style={isHot
+                      ? { background: "rgba(255,255,255,0.12)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }
+                      : { background: `linear-gradient(135deg,${OCEAN.mid},${OCEAN.teal})`, color: "#fff" }}>
+                    <MessageCircle className="w-4 h-4" />
+                    Fiyat Öğren
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="text-center mt-10">
-          <button
-            onClick={() => wa()}
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold transition-all hover:scale-105 shadow-lg text-white"
-            style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
-          >
-            <MessageCircle className="w-5 h-5" />
-            Özel Paket İçin Yazın
+        <p className="text-center text-sm mt-10 text-gray-400">
+          Özel ihtiyaçlarınız için{" "}
+          <button onClick={() => wa(venue)} className="underline underline-offset-2 hover:opacity-70" style={{ color: OCEAN.teal }}>
+            bizimle iletişime geçin
           </button>
-        </div>
+        </p>
       </div>
     </section>
   );
 }
 
-// ─── CONTACT ──────────────────────────────────────────────────────────────────
+/* ── CONTACT ─────────────────────────────────────────── */
 function LinaContact({ venue }: Props) {
-  const wa = () => {
-    window.open(`https://wa.me/${venue.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(`Merhaba, ${venue.venueName} hakkında bilgi almak istiyorum.`)}`, "_blank");
-  };
+  const ref = useRef<HTMLElement>(null!);
+  const visible = useInView(ref);
 
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden"
-      style={{ background: "linear-gradient(160deg, #0a1628 0%, #0d2744 60%, #0e3d6e 100%)" }}>
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
-        <svg viewBox="0 0 1440 80" className="w-full">
-          <path fill="white" d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,20 1440,40 L1440,80 L0,80 Z" />
+    <section ref={ref} className="relative py-20 sm:py-32 px-4 sm:px-6 overflow-hidden"
+      style={{ background: `linear-gradient(175deg,${OCEAN.deep} 0%,${OCEAN.navy} 40%,${OCEAN.mid} 100%)` }}>
+
+      {/* Top wave */}
+      <div className="absolute top-0 left-0 w-full overflow-hidden">
+        <svg viewBox="0 0 1440 80" className="w-full" preserveAspectRatio="none" style={{ transform: "rotate(180deg)" }}>
+          <path fill={OCEAN.sand} d="M0,30 C360,80 720,0 1080,50 C1260,70 1380,15 1440,35 L1440,80 L0,80 Z" />
         </svg>
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10 pt-8 text-center">
-        <span className="inline-block text-cyan-300 text-sm font-medium tracking-widest uppercase mb-4">İletişim</span>
-        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white mb-4">Hayalini Konuşalım</h2>
-        <p className="text-white/60 mb-10 max-w-lg mx-auto">
-          Özel gününüz için en iyi teklifi almak üzere bize ulaşın. 7/24 hizmetinizdeyiz.
-        </p>
+      {/* Glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10"
+          style={{ background: OCEAN.aqua, filter: "blur(100px)" }} />
+      </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <button
-            onClick={wa}
-            className="flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold text-lg text-white hover:scale-105 transition-all shadow-2xl"
-            style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
-          >
-            <MessageCircle className="w-6 h-6" />
+      <div className="max-w-3xl mx-auto relative z-10 pt-10">
+        {/* Header */}
+        <div className="text-center mb-12 transition-all duration-700" style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}>
+          <p className="text-xs tracking-[0.35em] uppercase font-semibold mb-4" style={{ color: OCEAN.foam }}>İletişim</p>
+          <h2 className="font-serif text-white mb-3" style={{ fontSize: "clamp(2rem,5vw,3.5rem)" }}>Hayalini Konuşalım</h2>
+          <p style={{ color: "rgba(168,230,240,0.5)", maxWidth: 400, margin: "0 auto", fontSize: "0.9375rem" }}>
+            Özel gününüz için en iyi teklifi almak üzere bize ulaşın. 7/24 hizmetinizdeyiz.
+          </p>
+        </div>
+
+        {/* Main CTAs */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 transition-all duration-700 delay-100"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}>
+          <button onClick={() => wa(venue)}
+            className="flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold text-white hover:scale-105 transition-all"
+            style={{ background: "linear-gradient(135deg,#25D366,#128C7E)", boxShadow: "0 8px 32px rgba(37,211,102,0.3)", fontSize: "1rem" }}>
+            <MessageCircle className="w-5 h-5" />
             WhatsApp&apos;tan Yaz
           </button>
-          <a
-            href={`tel:${venue.phone}`}
-            className="flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold text-lg text-white hover:scale-105 transition-all border border-white/20 backdrop-blur-sm bg-white/10 hover:bg-white/20"
-          >
-            <Phone className="w-6 h-6" />
+          <a href={`tel:${venue.phone}`}
+            className="flex items-center justify-center gap-3 px-10 py-4 rounded-full font-semibold text-white hover:scale-105 transition-all"
+            style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.12)", fontSize: "1rem" }}>
+            <Phone className="w-5 h-5" />
             {venue.phone}
           </a>
         </div>
 
         {/* Info cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          <div className="rounded-2xl p-5 border border-white/10 bg-white/5">
-            <MapPin className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
-            <p className="text-white/60 text-xs mb-1">Adres</p>
-            <p className="text-white text-sm font-medium leading-snug">{venue.address}</p>
-          </div>
-          <div className="rounded-2xl p-5 border border-white/10 bg-white/5">
-            <Phone className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
-            <p className="text-white/60 text-xs mb-1">Telefon</p>
-            <p className="text-white text-sm font-medium">{venue.phone}</p>
-          </div>
-          {venue.instagramUrl && (
-            <a
-              href={venue.instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl p-5 border border-white/10 bg-white/5 hover:bg-white/10 transition-all"
-            >
-              <Instagram className="w-6 h-6 text-pink-300 mx-auto mb-2" />
-              <p className="text-white/60 text-xs mb-1">Instagram</p>
-              <p className="text-white text-sm font-medium">@linadavetflorya</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10 transition-all duration-700 delay-200"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}>
+          {[
+            { icon: <MapPin className="w-5 h-5" />, label: "Adres", val: venue.address, href: venue.mapUrl },
+            { icon: <Phone className="w-5 h-5" />, label: "Telefon", val: venue.phone, href: `tel:${venue.phone}` },
+            { icon: <Instagram className="w-5 h-5" />, label: "Instagram", val: "@linadavetflorya", href: venue.instagramUrl },
+          ].map((c, i) => c.href ? (
+            <a key={i} href={c.href} target="_blank" rel="noopener noreferrer"
+              className="group rounded-2xl p-5 text-center transition-all hover:-translate-y-1"
+              style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)", border: "1px solid rgba(56,178,204,0.1)" }}>
+              <div className="mb-2 flex justify-center" style={{ color: OCEAN.foam }}>{c.icon}</div>
+              <p className="text-xs mb-1" style={{ color: "rgba(168,230,240,0.4)" }}>{c.label}</p>
+              <p className="text-white text-sm font-medium leading-snug">{c.val}</p>
             </a>
-          )}
+          ) : (
+            <div key={i} className="rounded-2xl p-5 text-center"
+              style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)", border: "1px solid rgba(56,178,204,0.1)" }}>
+              <div className="mb-2 flex justify-center" style={{ color: OCEAN.foam }}>{c.icon}</div>
+              <p className="text-xs mb-1" style={{ color: "rgba(168,230,240,0.4)" }}>{c.label}</p>
+              <p className="text-white text-sm font-medium leading-snug">{c.val}</p>
+            </div>
+          ))}
         </div>
 
         {/* Map */}
-        <div className="rounded-2xl overflow-hidden h-56 sm:h-72 border border-white/10">
+        <div className="rounded-2xl overflow-hidden border transition-all duration-700 delay-300"
+          style={{ height: 260, borderColor: "rgba(56,178,204,0.15)", opacity: visible ? 1 : 0 }}>
           <iframe
-            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyD-placeholder&q=${encodeURIComponent(venue.address + ", " + venue.city)}`}
-            width="100%"
-            height="100%"
-            style={{ border: 0, filter: "invert(90%) hue-rotate(180deg)" }}
-            allowFullScreen
-            loading="lazy"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(venue.address + " " + venue.city)}&output=embed`}
+            width="100%" height="100%"
+            style={{ border: 0, filter: "saturate(0.3) brightness(0.6) hue-rotate(180deg)" }}
+            allowFullScreen loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
-            title="Lina Davet Florya Konum"
+            title={`${venue.venueName} Konum`}
           />
         </div>
 
-        <div className="mt-10 pt-6 border-t border-white/10 text-white/30 text-xs">
+        {/* Footer */}
+        <p className="text-center mt-10 text-xs" style={{ color: "rgba(168,230,240,0.2)" }}>
           © {new Date().getFullYear()} {venue.venueName}. Tüm hakları saklıdır.
-        </div>
+        </p>
       </div>
     </section>
   );
 }
 
-// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
+/* ── EXPORT ───────────────────────────────────────────── */
 export default function LinaVenuePage({ venue }: Props) {
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: OCEAN.sand }}>
+      <FloatingNav venue={venue} />
       <LinaHero venue={venue} />
+      <TaglineStrip />
       <LinaAbout venue={venue} />
       <LinaFeatures venue={venue} />
       <LinaPackages venue={venue} />
