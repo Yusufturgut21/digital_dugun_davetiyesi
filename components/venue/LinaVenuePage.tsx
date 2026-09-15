@@ -87,24 +87,23 @@ function FloatingNav({ venue }: Props) {
 
 /* ── HERO ────────────────────────────────────────────── */
 
-// Pexels lisanssız stok deniz videoları — CDN direkt, indirme gerekmez
-const OCEAN_VIDEOS = [
-  "https://videos.pexels.com/video-files/1409899/1409899-uhd_2560_1440_25fps.mp4",   // sakin deniz yüzeyi, günbatımı
-  "https://videos.pexels.com/video-files/857611/857611-hd_1920_1080_25fps.mp4",      // yedek: dalgalar
-];
+// Sadece heroVideo da heroImage da yoksa kullanılır
+const FALLBACK_VIDEO = "https://videos.pexels.com/video-files/1409899/1409899-uhd_2560_1440_25fps.mp4";
 
 function LinaHero({ venue }: Props) {
   const scrollY = useScrollY();
   const [videoLoaded, setVideoLoaded] = useState(false);
-  // Admin'den girilmişse önce onu kullan, yoksa stok video
-  const videoSrc = venue.heroVideo || OCEAN_VIDEOS[0];
+
+  // Öncelik: admin'den yüklenen video > admin'den yüklenen fotoğraf > stok video
+  const hasCustomVideo = !!venue.heroVideo;
+  const hasHeroImage   = !!venue.heroImage;
+  const videoSrc       = venue.heroVideo || (!hasHeroImage ? FALLBACK_VIDEO : null);
+  const showVideo      = !!videoSrc;
 
   return (
     <section className="relative h-screen min-h-[680px] overflow-hidden flex items-center justify-center">
 
-      {/* ── BACKGROUND: Video (önce) → heroImage → gradient ── */}
-
-      {/* Gradient her zaman en altta — video yüklenene kadar görünür */}
+      {/* 1. Gradient — her zaman en altta */}
       <div className="absolute inset-0" style={{
         background: `linear-gradient(180deg,
           ${OCEAN.deep} 0%,
@@ -117,34 +116,37 @@ function LinaHero({ venue }: Props) {
           #2aa8cc 100%)`
       }} />
 
-      {/* Hero image fallback (admin'den yüklendiyse) */}
-      {venue.heroImage && !videoLoaded && (
-        <div className="absolute inset-0"
+      {/* 2. Hero IMAGE — video yoksa tam arka plan olarak göster */}
+      {hasHeroImage && !hasCustomVideo && (
+        <div
+          className="absolute inset-0"
           style={{
             backgroundImage: `url(${venue.heroImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
+            transform: `scale(1.04) translateY(${scrollY * 0.06}px)`,
           }}
         />
       )}
 
-      {/* Video arka plan */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onCanPlay={() => setVideoLoaded(true)}
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-        style={{
-          opacity: videoLoaded ? 1 : 0,
-          transform: `scale(1.04) translateY(${scrollY * 0.08}px)`,
-        }}
-      >
-        <source src={videoSrc} type="video/mp4" />
-        <source src={OCEAN_VIDEOS[1]} type="video/mp4" />
-      </video>
+      {/* 3. VIDEO — admin'den yüklenmiş video VEYA heroImage yoksa stok video */}
+      {showVideo && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onCanPlay={() => setVideoLoaded(true)}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+          style={{
+            opacity: videoLoaded ? 1 : 0,
+            transform: `scale(1.04) translateY(${scrollY * 0.08}px)`,
+          }}
+        >
+          <source src={videoSrc!} type="video/mp4" />
+        </video>
+      )}
 
       {/* Sinematik overlay — videoyu premium gösterir, kontrast sağlar */}
       <div className="absolute inset-0" style={{
