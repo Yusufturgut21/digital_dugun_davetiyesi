@@ -5,6 +5,7 @@ import {
   MessageCircle, Phone, MapPin, Check, ChevronDown,
   Instagram, Sparkles, Star, Users, Award, ArrowRight
 } from "lucide-react";
+import OceanCanvas from "./OceanCanvas";
 
 interface Props { venue: VenueWebsite; }
 
@@ -87,70 +88,60 @@ function FloatingNav({ venue }: Props) {
 /* ── HERO ────────────────────────────────────────────── */
 function LinaHero({ venue }: Props) {
   const scrollY = useScrollY();
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 60);
-    return () => clearInterval(id);
-  }, []);
 
   return (
     <section className="relative h-screen min-h-[680px] overflow-hidden flex items-center justify-center">
 
-      {/* Deep ocean background */}
-      <div className="absolute inset-0" style={{ background: `linear-gradient(175deg, ${OCEAN.deep} 0%, ${OCEAN.navy} 30%, ${OCEAN.mid} 60%, ${OCEAN.teal} 85%, ${OCEAN.aqua} 100%)` }} />
+      {/* Sky gradient — upper half */}
+      <div className="absolute inset-0" style={{
+        background: `linear-gradient(180deg,
+          ${OCEAN.deep} 0%,
+          ${OCEAN.navy} 18%,
+          #0c3356 36%,
+          #0d4a6a 52%,
+          #0e5f82 65%,
+          #117598 78%,
+          #1a8fb5 90%,
+          #2aa8cc 100%)`
+      }} />
 
-      {/* Animated shimmer light rays */}
+      {/* Subtle light rays from upper-right */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[15, 35, 55, 72, 88].map((left, i) => (
-          <div key={i} className="absolute top-0 bottom-0 w-px"
+        {[20, 38, 56, 74].map((left, i) => (
+          <div key={i} className="absolute top-0 h-full"
             style={{
               left: `${left}%`,
-              background: `linear-gradient(180deg, transparent 0%, rgba(56,178,204,${0.04 + (i % 3) * 0.02}) 40%, transparent 100%)`,
-              transform: `scaleX(${8 + (i % 4) * 6}) skewX(${-2 + i}deg)`,
-              animation: `shimmer ${6 + i}s ease-in-out infinite`,
-              animationDelay: `${i * 1.2}s`,
+              width: `${60 + i * 40}px`,
+              background: `linear-gradient(180deg, rgba(180,230,255,${0.025 + i * 0.008}) 0%, transparent 70%)`,
+              transform: `skewX(${-8 + i * 3}deg)`,
+              animation: `shimmer ${7 + i * 2}s ease-in-out infinite`,
+              animationDelay: `${i * 1.8}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Parallax bubbles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 18 }).map((_, i) => {
-          const size = 4 + (i % 5) * 5;
-          return (
-            <div key={i} className="absolute rounded-full"
-              style={{
-                width: size, height: size,
-                left: `${5 + (i * 5.5) % 90}%`,
-                top: `${10 + (i * 7.3) % 75}%`,
-                background: `radial-gradient(circle at 35% 35%, rgba(168,230,240,0.4), rgba(56,178,204,0.1))`,
-                border: "1px solid rgba(168,230,240,0.2)",
-                transform: `translateY(${scrollY * (0.05 + (i % 4) * 0.03) * -1}px)`,
-                animation: `rise ${5 + (i % 4)}s ease-in-out infinite`,
-                animationDelay: `${(i * 0.6) % 5}s`,
-              }}
-            />
-          );
-        })}
-      </div>
+      {/* ── OCEAN CANVAS — bottom 55% of hero ── */}
+      <OceanCanvas
+        className="absolute left-0 right-0 bottom-0 pointer-events-none"
+        style={{ height: "58%", width: "100%" }}
+      />
 
-      {/* Animated wave SVG layers */}
-      <div className="absolute bottom-0 left-0 w-full">
-        <svg viewBox="0 0 1440 300" className="w-full" preserveAspectRatio="none"
-          style={{ transform: `translateY(${scrollY * 0.15}px)` }}>
-          <defs>
-            <linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={OCEAN.aqua} stopOpacity="0.15" />
-              <stop offset="100%" stopColor={OCEAN.aqua} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path fill="url(#wg1)" d={`M0,180 C${240 + Math.sin(tick * 0.02) * 30},${120 + Math.cos(tick * 0.015) * 20} ${480},${200 + Math.sin(tick * 0.018 + 1) * 25} ${720},${160 + Math.cos(tick * 0.02 + 2) * 20} C${960},${120 + Math.sin(tick * 0.016 + 3) * 25} ${1200},${190 + Math.cos(tick * 0.019) * 20} 1440,170 L1440,300 L0,300 Z`} />
-        </svg>
-        <svg viewBox="0 0 1440 200" className="w-full absolute bottom-0" preserveAspectRatio="none">
-          <path fill={OCEAN.sand} d={`M0,120 C${360 + Math.sin(tick * 0.025) * 20},${60 + Math.cos(tick * 0.02) * 15} ${720},${140 + Math.sin(tick * 0.022) * 20} ${1080},${80 + Math.cos(tick * 0.018) * 15} C${1260},${110 + Math.sin(tick * 0.02) * 12} ${1380},${90} 1440,100 L1440,200 L0,200 Z`} />
-        </svg>
-      </div>
+      {/* Horizon glow where sky meets sea */}
+      <div className="absolute pointer-events-none"
+        style={{
+          left: 0, right: 0,
+          bottom: "54%",
+          height: "80px",
+          background: "linear-gradient(180deg, transparent 0%, rgba(40,170,210,0.18) 50%, transparent 100%)",
+          filter: "blur(12px)",
+        }}
+      />
+
+      {/* Sand/shore fade at very bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+        style={{ background: `linear-gradient(180deg, transparent, ${OCEAN.sand})` }} />
+
 
       {/* CONTENT */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
@@ -233,14 +224,13 @@ function LinaHero({ venue }: Props) {
       </div>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/30 animate-bounce">
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-white/30 animate-bounce">
         <ChevronDown className="w-5 h-5" />
         <span className="text-xs tracking-widest uppercase">Keşfet</span>
       </div>
 
       <style>{`
-        @keyframes shimmer { 0%,100%{opacity:0.5} 50%{opacity:1} }
-        @keyframes rise { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-18px) scale(1.1)} }
+        @keyframes shimmer { 0%,100%{opacity:0.4} 50%{opacity:1} }
       `}</style>
     </section>
   );
