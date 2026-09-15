@@ -269,6 +269,33 @@ function LinaHero({ venue }: Props) {
             {venue.phone}
           </a>
         </div>
+
+        {/* Detaylı İncele butonu */}
+        <div className="mt-5">
+          <button
+            onClick={() => {
+              document.getElementById("lina-about")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="group inline-flex items-center gap-2 font-medium transition-all duration-300 hover:gap-3"
+            style={{
+              color: "rgba(168,230,240,0.75)",
+              fontSize: "0.9rem",
+              letterSpacing: "0.05em",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            <span>Detaylı İncele</span>
+            <div className="flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 group-hover:translate-y-1"
+              style={{
+                border: "1.5px solid rgba(168,230,240,0.4)",
+                background: "rgba(255,255,255,0.04)",
+              }}>
+              <ChevronDown className="w-4 h-4" />
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Scroll hint */}
@@ -361,7 +388,7 @@ function LinaAbout({ venue }: Props) {
     { icon: <Sparkles className="w-6 h-6" />, val: "100%", label: "Memnuniyet" },
   ];
   return (
-    <section ref={ref} className="relative py-20 sm:py-32 px-4 sm:px-6 overflow-hidden" style={{ background: OCEAN.sand }}>
+    <section ref={ref} id="lina-about" className="relative py-20 sm:py-32 px-4 sm:px-6 overflow-hidden" style={{ background: OCEAN.sand }}>
       {/* Decorative circle */}
       <div className="absolute -right-32 -top-32 w-96 h-96 rounded-full opacity-10 pointer-events-none"
         style={{ background: `radial-gradient(circle, ${OCEAN.aqua}, transparent)` }} />
