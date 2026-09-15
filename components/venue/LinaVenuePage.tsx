@@ -207,20 +207,6 @@ function LinaHero({ venue }: Props) {
 
       {/* CONTENT */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 mb-8"
-          style={{
-            background: "rgba(255,255,255,0.04)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(168,230,240,0.2)",
-            borderRadius: 999,
-            padding: "6px 20px",
-          }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="text-cyan-200 text-xs tracking-[0.3em] uppercase font-light">Florya · İstanbul · Deniz Kenarı</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-        </div>
-
         {/* Main title */}
         <h1 style={{
           fontFamily: "Georgia, serif",
