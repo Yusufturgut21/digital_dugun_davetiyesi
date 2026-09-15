@@ -10,6 +10,7 @@ import VenueRealWeddings from "./VenueRealWeddings";
 import VenueMap from "./VenueMap";
 import VenueContact from "./VenueContact";
 import VenueInvitationPromo from "./VenueInvitationPromo";
+import LinaVenuePage from "./LinaVenuePage";
 
 interface Props {
   slug: string;
@@ -53,15 +54,21 @@ export default function VenueWebsitePage({ slug }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      <VenueHero venue={venue} />
-      <VenueAbout venue={venue} />
-      <VenueGallery venue={venue} />
-      <VenueFeatures venue={venue} />
-      <VenuePackages venue={venue} />
-      <VenueRealWeddings venue={venue} />
-      <VenueInvitationPromo />
-      <VenueMap venue={venue} />
-      <VenueContact venue={venue} />
+      {slug === "lina-davet-florya" ? (
+        <LinaVenuePage venue={venue} />
+      ) : (
+        <>
+          <VenueHero venue={venue} />
+          <VenueAbout venue={venue} />
+          <VenueGallery venue={venue} />
+          <VenueFeatures venue={venue} />
+          <VenuePackages venue={venue} />
+          <VenueRealWeddings venue={venue} />
+          <VenueInvitationPromo />
+          <VenueMap venue={venue} />
+          <VenueContact venue={venue} />
+        </>
+      )}
     </div>
   );
 }
