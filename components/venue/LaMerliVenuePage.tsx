@@ -563,10 +563,10 @@ export default function LaMerliVenuePage({ venue }: Props) {
         <MerliNav venue={venue} show={curtainDone && scrollY > 60} />
         <MerliHero venue={venue} />
         <MerliStrip />
+        <MerliGallery venue={venue} />
         <MerliAbout venue={venue} />
         <MerliFeatures venue={venue} />
         <MerliPackages venue={venue} />
-        <MerliGallery venue={venue} />
         <MerliContact venue={venue} />
       </div>
     </div>
