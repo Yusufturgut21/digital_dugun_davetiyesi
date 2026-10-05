@@ -1,21 +1,39 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api-client";
+import { ShoppingCart, RefreshCw, Package } from "lucide-react";
 
-interface RSVPData {
-  stats: { yes: number; no: number; maybe: number; totalGuests: number; total: number };
-  items: { id: string; guestName: string; phone?: string; guestCount: number; attendance: string; note?: string; createdAt: string }[];
+interface OrderData {
+  stats: { pending: number; confirmed: number; shipped: number; delivered: number; total: number; revenue: number };
+  items: {
+    id: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone?: string;
+    totalAmount: number;
+    status: string;
+    note?: string;
+    createdAt: string;
+  }[];
 }
 
-export default function PanelRSVPPage() {
-  const [data, setData] = useState<RSVPData | null>(null);
+const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
+  pending: { label: "Bekliyor", color: "#fbbf24", bg: "rgba(251,191,36,0.1)" },
+  confirmed: { label: "Onaylandı", color: "#60a5fa", bg: "rgba(96,165,250,0.1)" },
+  shipped: { label: "Kargoda", color: "#a78bfa", bg: "rgba(167,139,250,0.1)" },
+  delivered: { label: "Teslim Edildi", color: "#4ade80", bg: "rgba(74,222,128,0.1)" },
+  cancelled: { label: "İptal", color: "#f87171", bg: "rgba(239,68,68,0.1)" },
+};
+
+export default function OrdersPage() {
+  const [data, setData] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const load = useCallback(() => {
     setLoading(true);
     setError("");
-    apiFetch<RSVPData>("/api/couple/rsvp")
+    apiFetch<OrderData>("/api/couple/rsvp")
       .then(setData)
       .catch((err) => setError(err instanceof Error ? err.message : "Yüklenemedi"))
       .finally(() => setLoading(false));
@@ -24,71 +42,120 @@ export default function PanelRSVPPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading && !data) {
-    return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "rgba(201,168,76,0.4)", borderTopColor: "transparent" }} /></div>;
+    return (
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin border-amber-500/40" />
+      </div>
+    );
   }
 
   if (error && !data) {
     return (
       <div className="text-center py-20 space-y-4">
-        <p className="font-sans text-sm text-red-400">{error}</p>
-        <button onClick={load} className="px-4 py-2 rounded-lg font-sans text-xs" style={{ border: "1px solid rgba(201,168,76,0.3)", color: "#E8D5A3" }}>Tekrar Dene</button>
+        <p className="text-sm text-red-400">{error}</p>
+        <button
+          onClick={load}
+          className="px-4 py-2 rounded-lg text-xs border border-neutral-700 text-neutral-400 hover:text-white transition-colors"
+        >
+          Tekrar Dene
+        </button>
       </div>
     );
   }
 
-  if (!data) return null;
-
-  const { stats, items } = data;
+  const stats = data?.stats ?? { pending: 0, confirmed: 0, shipped: 0, delivered: 0, total: 0, revenue: 0 };
+  const items = data?.items ?? [];
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-serif text-2xl font-light" style={{ color: "#E8D5A3" }}>RSVP / Katılım</h2>
-        <button onClick={load} disabled={loading} className="px-3 py-1.5 rounded-lg font-sans text-xs" style={{ border: "1px solid rgba(201,168,76,0.3)", color: "rgba(201,168,76,0.7)" }}>
-          {loading ? "Yenileniyor…" : "Yenile"}
+        <div>
+          <h2 className="font-serif text-3xl font-bold text-white">Siparişler</h2>
+          <p className="text-sm text-neutral-500 mt-1">{stats.total} sipariş</p>
+        </div>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs border border-neutral-700 text-neutral-400 hover:text-white transition-colors"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          Yenile
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[
-          { label: "Katılacak", value: stats.yes, color: "#4ade80" },
-          { label: "Katılmayacak", value: stats.no, color: "#f87171" },
-          { label: "Belirsiz", value: stats.maybe, color: "#fbbf24" },
-          { label: "Toplam Kişi", value: stats.totalGuests, color: "#E8D5A3" },
+          { label: "Bekleyen", value: stats.pending, color: "#fbbf24" },
+          { label: "Onaylanan", value: stats.confirmed, color: "#60a5fa" },
+          { label: "Kargoda", value: stats.shipped, color: "#a78bfa" },
+          { label: "Teslim Edildi", value: stats.delivered, color: "#4ade80" },
+          { label: "Toplam Sipariş", value: stats.total, color: "#E8C547" },
+          { label: "Toplam Gelir", value: `${stats.revenue.toLocaleString("tr-TR")} ₺`, color: "#34d399" },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
-            <p className="font-sans text-xs uppercase tracking-widest mb-1" style={{ color: "rgba(201,168,76,0.5)" }}>{s.label}</p>
-            <p className="font-serif text-2xl" style={{ color: s.color }}>{s.value}</p>
+          <div
+            key={s.label}
+            className="rounded-xl p-4"
+            style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <p className="text-xs text-neutral-500 uppercase tracking-widest mb-1">{s.label}</p>
+            <p className="text-xl font-bold" style={{ color: s.color }}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(201,168,76,0.12)" }}>
+      {/* Table */}
+      <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
         <table className="w-full">
           <thead>
-            <tr style={{ background: "rgba(201,168,76,0.08)" }}>
-              {["Misafir", "Telefon", "Kişi", "Durum", "Not", "Tarih"].map((h) => (
-                <th key={h} className="px-3 py-2 font-sans text-xs uppercase text-left" style={{ color: "rgba(201,168,76,0.6)" }}>{h}</th>
+            <tr style={{ background: "rgba(232,197,71,0.06)" }}>
+              {["Sipariş No", "Müşteri", "Telefon", "Tutar", "Durum", "Not", "Tarih"].map((h) => (
+                <th
+                  key={h}
+                  className="px-3 py-2 font-sans text-xs uppercase text-left text-amber-500/60"
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {items.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Henüz RSVP yok</td></tr>
-            ) : items.map((r) => (
-              <tr key={r.id} className="border-t" style={{ borderColor: "rgba(201,168,76,0.08)" }}>
-                <td className="px-3 py-2 font-sans text-sm" style={{ color: "#E8D5A3" }}>{r.guestName}</td>
-                <td className="px-3 py-2 font-sans text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{r.phone || "—"}</td>
-                <td className="px-3 py-2 font-sans text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>{r.guestCount}</td>
-                <td className="px-3 py-2 font-sans text-xs" style={{ color: r.attendance === "yes" ? "#4ade80" : "#f87171" }}>
-                  {r.attendance === "yes" ? "Katılacak" : r.attendance === "no" ? "Katılmayacak" : "Belirsiz"}
-                </td>
-                <td className="px-3 py-2 font-sans text-xs max-w-[120px] truncate" style={{ color: "rgba(255,255,255,0.4)" }}>{r.note || "—"}</td>
-                <td className="px-3 py-2 font-sans text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  {new Date(r.createdAt).toLocaleDateString("tr-TR")}
+              <tr>
+                <td colSpan={7} className="px-4 py-12 text-center">
+                  <ShoppingCart className="w-12 h-12 mx-auto mb-3 text-neutral-700" />
+                  <p className="text-sm text-neutral-600">Henüz sipariş yok</p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              items.map((o) => {
+                const s = STATUS_MAP[o.status] ?? STATUS_MAP.pending;
+                return (
+                  <tr key={o.id} className="border-t" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+                    <td className="px-3 py-2 text-sm text-amber-400 font-mono">#{o.orderNumber}</td>
+                    <td className="px-3 py-2 text-sm text-white font-medium">{o.customerName}</td>
+                    <td className="px-3 py-2 text-xs text-neutral-500">{o.customerPhone || "—"}</td>
+                    <td className="px-3 py-2 text-sm text-amber-400 font-semibold">
+                      {o.totalAmount.toLocaleString("tr-TR")} ₺
+                    </td>
+                    <td className="px-3 py-2">
+                      <span
+                        className="text-xs px-2 py-0.5 rounded-full"
+                        style={{ background: s.bg, color: s.color }}
+                      >
+                        {s.label}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-neutral-500 max-w-[100px] truncate">
+                      {o.note || "—"}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-neutral-600">
+                      {new Date(o.createdAt).toLocaleDateString("tr-TR")}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

@@ -3,64 +3,149 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
-import { WeddingInvitation } from "@/lib/types";
+import { Package, ShoppingCart, TrendingUp, ArrowRight, Plus } from "lucide-react";
 
-export default function PanelDashboard() {
+interface StoreData {
+  slug: string;
+  storeName?: string;
+  isActive?: boolean;
+  totalProducts?: number;
+  totalOrders?: number;
+  pendingOrders?: number;
+  revenue?: number;
+}
+
+export default function StoreDashboard() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const [invitation, setInvitation] = useState<WeddingInvitation | null>(null);
+  const [store, setStore] = useState<StoreData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<WeddingInvitation>("/api/couple/invitation")
+    apiFetch<StoreData>("/api/couple/invitation")
       .then((data) => {
         if (data.slug !== slug) {
           router.replace(`/panel/${data.slug}`);
         } else {
-          setInvitation(data);
+          setStore(data);
         }
       })
       .finally(() => setLoading(false));
   }, [slug, router]);
 
-  if (loading || !invitation) {
-    return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "rgba(201,168,76,0.4)", borderTopColor: "transparent" }} /></div>;
+  if (loading || !store) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin border-amber-500/40" />
+      </div>
+    );
   }
 
-  const displayName = `${invitation.groomName} ${invitation.conjunction} ${invitation.brideName}`;
+  const stats = [
+    { label: "Toplam Ürün", value: store.totalProducts ?? 0, icon: Package, color: "#E8C547" },
+    { label: "Toplam Sipariş", value: store.totalOrders ?? 0, icon: ShoppingCart, color: "#60a5fa" },
+    { label: "Bekleyen Sipariş", value: store.pendingOrders ?? 0, icon: ShoppingCart, color: "#f87171" },
+    { label: "Toplam Gelir", value: `${(store.revenue ?? 0).toLocaleString("tr-TR")} ₺`, icon: TrendingUp, color: "#4ade80" },
+  ];
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-8 max-w-4xl">
       <div>
-        <h2 className="font-serif text-3xl font-light" style={{ color: "#E8D5A3" }}>Hoş Geldiniz</h2>
-        <p className="font-sans text-sm mt-1" style={{ color: "rgba(201,168,76,0.5)" }}>{displayName} — Davetiye Paneli</p>
+        <h2 className="font-serif text-3xl font-bold text-white">
+          Hoş Geldiniz 👋
+        </h2>
+        <p className="text-sm text-neutral-500 mt-1">
+          {store.storeName || "Mağazanız"} — Yönetim Paneli
+        </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
-        {[
-          { label: "Düğün Tarihi", value: invitation.weddingDate ? new Date(invitation.weddingDate).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "—" },
-          { label: "Saat", value: invitation.weddingTime || "—" },
-          { label: "Durum", value: invitation.isActive ? "Aktif" : "Pasif" },
-          { label: "Davetiye URL", value: `/davet/${invitation.slug}` },
-        ].map((item) => (
-          <div key={item.label} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
-            <p className="font-sans text-xs tracking-widest uppercase mb-1" style={{ color: "rgba(201,168,76,0.5)" }}>{item.label}</p>
-            <p className="font-serif text-lg" style={{ color: "#E8D5A3" }}>{item.value}</p>
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        {stats.map(({ label, value, icon: Icon, color }) => (
+          <div
+            key={label}
+            className="rounded-xl p-5 flex items-start justify-between"
+            style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div>
+              <p className="text-xs text-neutral-500 uppercase tracking-widest mb-2">{label}</p>
+              <p className="text-2xl font-bold text-white">{value}</p>
+            </div>
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ background: color + "20" }}
+            >
+              <Icon className="w-5 h-5" style={{ color }} />
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Link href={`/panel/${slug}/edit`} className="panel-btn panel-btn-primary">Davetiyeyi Düzenle</Link>
-        <Link href={`/davet/${invitation.slug}`} target="_blank" className="panel-btn">Davetiye Önizleme</Link>
-        <Link href={`/panel/${slug}/rsvp`} className="panel-btn">RSVP Kayıtları</Link>
+      {/* Quick actions */}
+      <div>
+        <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-widest mb-4">
+          Hızlı Erişim
+        </h3>
+        <div className="grid sm:grid-cols-3 gap-3">
+          <Link
+            href={`/panel/${slug}/products/new`}
+            className="flex items-center justify-between p-4 rounded-xl text-sm font-medium transition-all"
+            style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div className="flex items-center gap-3">
+              <Plus className="w-5 h-5 text-amber-400" />
+              <span className="text-white">Yeni Ürün Ekle</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-neutral-600" />
+          </Link>
+
+          <Link
+            href={`/panel/${slug}/orders`}
+            className="flex items-center justify-between p-4 rounded-xl text-sm font-medium transition-all"
+            style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div className="flex items-center gap-3">
+              <ShoppingCart className="w-5 h-5 text-blue-400" />
+              <span className="text-white">Siparişler</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-neutral-600" />
+          </Link>
+
+          <Link
+            href="/"
+            target="_blank"
+            className="flex items-center justify-between p-4 rounded-xl text-sm font-medium transition-all"
+            style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div className="flex items-center gap-3">
+              <Package className="w-5 h-5 text-green-400" />
+              <span className="text-white">Mağazayı Gör</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-neutral-600" />
+          </Link>
+        </div>
       </div>
 
-      <style jsx global>{`
-        .panel-btn { display: inline-flex; padding: 10px 18px; border-radius: 10px; font-size: 12px; font-family: sans-serif; border: 1px solid rgba(201,168,76,0.2); color: rgba(232,213,163,0.7); }
-        .panel-btn-primary { background: linear-gradient(135deg, #C9A84C, #E8D5A3); color: #1a0f08; border: none; }
-      `}</style>
+      {/* Store status */}
+      <div
+        className="rounded-xl p-5 flex items-center justify-between"
+        style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div>
+          <p className="text-xs text-neutral-500 uppercase tracking-widest mb-1">Mağaza Durumu</p>
+          <p className="text-white font-medium">{store.storeName || "Mağazanız"}</p>
+        </div>
+        <span
+          className="text-xs px-3 py-1 rounded-full"
+          style={{
+            background: store.isActive ? "rgba(74,222,128,0.1)" : "rgba(239,68,68,0.1)",
+            color: store.isActive ? "#4ade80" : "#f87171",
+          }}
+        >
+          {store.isActive ? "Aktif" : "Pasif"}
+        </span>
+      </div>
     </div>
   );
 }

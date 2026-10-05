@@ -1,30 +1,66 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { apiFetch } from "@/lib/api-client";
+import { Package, ShoppingCart, TrendingUp, Store, Plus, ArrowRight } from "lucide-react";
 
 interface DashboardData {
   stats: {
-    totalCouples: number;
-    totalInvitations: number;
-    activeCouples: number;
-    inactiveCouples: number;
-    activeUsers: number;
-    totalRsvp: number;
-    upcomingCount: number;
-    totalVenues: number;
-    activeVenues: number;
+    totalProducts: number;
+    activeProducts: number;
+    totalOrders: number;
+    pendingOrders: number;
+    totalRevenue: number;
+    totalStores: number;
   };
-  upcomingWeddings: { id: string; groomName: string; brideName: string; weddingDate: string; slug: string }[];
-  recentCouples: { id: string; groomName: string; brideName: string; createdAt: string; slug: string }[];
+  recentOrders: {
+    id: string;
+    orderNumber: string;
+    customerName: string;
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+  }[];
+  topProducts: {
+    id: string;
+    name: string;
+    brand: string;
+    price: number;
+    category: string;
+  }[];
 }
 
-function StatCard({ label, value, color }: { label: string; value: number; color?: string }) {
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  color,
+  suffix,
+}: {
+  label: string;
+  value: number | string;
+  icon: React.ElementType;
+  color: string;
+  suffix?: string;
+}) {
   return (
-    <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
-      <p className="font-sans text-xs tracking-widest uppercase mb-2" style={{ color: "rgba(201,168,76,0.5)" }}>{label}</p>
-      <p className="font-serif text-3xl font-light" style={{ color: color || "#E8D5A3" }}>{value}</p>
+    <div
+      className="rounded-xl p-5 flex items-start justify-between"
+      style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      <div>
+        <p className="font-sans text-xs tracking-widest uppercase mb-2 text-neutral-500">{label}</p>
+        <p className="font-sans text-3xl font-bold text-white">
+          {value}
+          {suffix && <span className="text-lg ml-1 text-neutral-400">{suffix}</span>}
+        </p>
+      </div>
+      <div
+        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{ background: color + "20" }}
+      >
+        <Icon className="w-5 h-5" style={{ color }} />
+      </div>
     </div>
   );
 }
@@ -36,68 +72,122 @@ export default function AdminDashboard() {
     apiFetch<DashboardData>("/api/admin/dashboard").then(setData).catch(console.error);
   }, []);
 
-  if (!data) {
-    return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "rgba(201,168,76,0.4)", borderTopColor: "transparent" }} /></div>;
-  }
-
-  const { stats, upcomingWeddings, recentCouples } = data;
+  // Placeholder data for UI demo
+  const stats = data?.stats ?? {
+    totalProducts: 0,
+    activeProducts: 0,
+    totalOrders: 0,
+    pendingOrders: 0,
+    totalRevenue: 0,
+    totalStores: 0,
+  };
 
   return (
     <div className="space-y-8">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="font-serif text-3xl font-light" style={{ color: "#E8D5A3" }}>Dashboard</h2>
-          <p className="font-sans text-sm mt-1" style={{ color: "rgba(201,168,76,0.5)" }}>Sahra Düğün Salonu yönetim özeti</p>
+          <h2 className="font-serif text-3xl font-bold text-white">Dashboard</h2>
+          <p className="font-sans text-sm mt-1 text-neutral-500">StepStyle yönetim özeti</p>
         </div>
-        <Link href="/admin/couples/new" className="admin-btn admin-btn-primary inline-flex">+ Yeni Çift Oluştur</Link>
+        <Link
+          href="/admin/products/new"
+          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-md"
+          style={{ background: "#E8C547", color: "#0f0f0f" }}
+        >
+          <Plus className="w-4 h-4" />
+          Yeni Ürün Ekle
+        </Link>
       </div>
 
+      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard label="Toplam Çift" value={stats.totalCouples} />
-        <StatCard label="Toplam Davetiye" value={stats.totalInvitations} />
-        <StatCard label="Aktif Çift" value={stats.activeCouples} color="#4ade80" />
-        <StatCard label="Pasif Çift" value={stats.inactiveCouples} color="#f87171" />
-        <StatCard label="Toplam RSVP" value={stats.totalRsvp} />
-        <StatCard label="Aktif Kullanıcı" value={stats.activeUsers} />
-        <StatCard label="Yaklaşan Düğün" value={stats.upcomingCount} />
-        <StatCard label="Toplam Salon" value={stats.totalVenues} />
-        <StatCard label="Aktif Salon" value={stats.activeVenues} color="#4ade80" />
+        <StatCard label="Toplam Ürün" value={stats.totalProducts} icon={Package} color="#E8C547" />
+        <StatCard label="Aktif Ürün" value={stats.activeProducts} icon={Package} color="#4ade80" />
+        <StatCard label="Toplam Sipariş" value={stats.totalOrders} icon={ShoppingCart} color="#60a5fa" />
+        <StatCard label="Bekleyen Sipariş" value={stats.pendingOrders} icon={ShoppingCart} color="#f87171" />
+        <StatCard
+          label="Toplam Gelir"
+          value={stats.totalRevenue.toLocaleString("tr-TR")}
+          icon={TrendingUp}
+          color="#a78bfa"
+          suffix="₺"
+        />
+        <StatCard label="Mağaza Sayısı" value={stats.totalStores} icon={Store} color="#34d399" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
-          <h3 className="font-serif text-xl mb-4" style={{ color: "#E8D5A3" }}>Yaklaşan Düğünler</h3>
-          {upcomingWeddings.length === 0 ? (
-            <p className="font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Yaklaşan düğün yok</p>
+        {/* Recent Orders */}
+        <div
+          className="rounded-xl p-6"
+          style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="font-sans font-semibold text-white">Son Siparişler</h3>
+            <Link href="/admin/orders" className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
+              Tümü <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          {!data?.recentOrders?.length ? (
+            <p className="text-sm text-neutral-600">Henüz sipariş yok</p>
           ) : (
             <div className="space-y-3">
-              {upcomingWeddings.map((w) => (
-                <div key={w.id} className="flex items-center justify-between py-2 border-b" style={{ borderColor: "rgba(201,168,76,0.08)" }}>
-                  <span className="font-sans text-sm" style={{ color: "rgba(232,213,163,0.8)" }}>{w.groomName} & {w.brideName}</span>
-                  <span className="font-sans text-xs" style={{ color: "rgba(201,168,76,0.5)" }}>{w.weddingDate}</span>
+              {data.recentOrders.map((o) => (
+                <div
+                  key={o.id}
+                  className="flex items-center justify-between py-2 border-b"
+                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
+                >
+                  <div>
+                    <p className="text-sm text-white font-medium">{o.customerName}</p>
+                    <p className="text-xs text-neutral-500">#{o.orderNumber}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-amber-400 font-semibold">
+                      {o.totalAmount.toLocaleString("tr-TR")} ₺
+                    </p>
+                    <p className="text-xs text-neutral-600">{o.status}</p>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
-          <h3 className="font-serif text-xl mb-4" style={{ color: "#E8D5A3" }}>Son Eklenen Çiftler</h3>
-          <div className="space-y-3">
-            {recentCouples.map((c) => (
-              <Link key={c.id} href={`/admin/couples/${c.id}`} className="flex items-center justify-between py-2 border-b hover:opacity-80" style={{ borderColor: "rgba(201,168,76,0.08)" }}>
-                <span className="font-sans text-sm" style={{ color: "rgba(232,213,163,0.8)" }}>{c.groomName} & {c.brideName}</span>
-                <span className="font-sans text-xs" style={{ color: "rgba(201,168,76,0.5)" }}>Düzenle →</span>
-              </Link>
-            ))}
+        {/* Top Products */}
+        <div
+          className="rounded-xl p-6"
+          style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="font-sans font-semibold text-white">Ürünler</h3>
+            <Link href="/admin/products" className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
+              Tümü <ArrowRight className="w-3 h-3" />
+            </Link>
           </div>
+          {!data?.topProducts?.length ? (
+            <p className="text-sm text-neutral-600">Henüz ürün yok</p>
+          ) : (
+            <div className="space-y-3">
+              {data.topProducts.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between py-2 border-b"
+                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
+                >
+                  <div>
+                    <p className="text-sm text-white font-medium">{p.name}</p>
+                    <p className="text-xs text-neutral-500">{p.brand} · {p.category}</p>
+                  </div>
+                  <p className="text-sm text-amber-400 font-semibold">
+                    {p.price.toLocaleString("tr-TR")} ₺
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      <style jsx global>{`
-        .admin-btn { display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 10px; font-size: 12px; font-family: sans-serif; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
-        .admin-btn-primary { background: linear-gradient(135deg, #C9A84C, #E8D5A3); color: #1a0f08; font-weight: 500; }
-      `}</style>
     </div>
   );
 }

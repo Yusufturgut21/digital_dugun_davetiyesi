@@ -2,21 +2,27 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
-import { VenueWebsite } from "@/lib/types";
-import { Building2, Eye, Pencil, Trash2 } from "lucide-react";
+import { Store, Eye, Pencil, Trash2, Plus, ToggleLeft, ToggleRight } from "lucide-react";
 
-export default function VenuesPage() {
-  const [venues, setVenues] = useState<VenueWebsite[]>([]);
+interface StoreRow {
+  id: string;
+  slug: string;
+  storeName: string;
+  tagline: string;
+  city: string;
+  isActive: boolean;
+}
+
+export default function StoresPage() {
+  const [stores, setStores] = useState<StoreRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadVenues();
-  }, []);
+  useEffect(() => { loadStores(); }, []);
 
-  const loadVenues = async () => {
+  const loadStores = async () => {
     try {
-      const data = await apiFetch<VenueWebsite[]>("/api/venues");
-      setVenues(data);
+      const data = await apiFetch<StoreRow[]>("/api/venues");
+      setStores(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -25,13 +31,11 @@ export default function VenuesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Bu salonu silmek istediğinizden emin misiniz?")) return;
-    
+    if (!confirm("Bu mağazayı silmek istediğinizden emin misiniz?")) return;
     try {
       await apiFetch(`/api/venues/${id}`, { method: "DELETE" });
-      loadVenues();
-    } catch (error) {
-      console.error(error);
+      loadStores();
+    } catch {
       alert("Silme işlemi başarısız");
     }
   };
@@ -39,7 +43,7 @@ export default function VenuesPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "rgba(201,168,76,0.4)" }} />
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin border-amber-500/40" />
       </div>
     );
   }
@@ -48,67 +52,79 @@ export default function VenuesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="font-serif text-3xl font-light" style={{ color: "#E8D5A3" }}>Düğün Salonları</h2>
-          <p className="font-sans text-sm mt-1" style={{ color: "rgba(201,168,76,0.5)" }}>
-            Salon web sitelerini yönetin
-          </p>
+          <h2 className="font-serif text-3xl font-bold text-white">Mağazalar</h2>
+          <p className="text-sm text-neutral-500 mt-1">Mağaza web sitelerini yönetin</p>
         </div>
-        <Link href="/admin/venues/new" className="admin-btn admin-btn-primary inline-flex items-center gap-2">
-          <Building2 className="w-4 h-4" />
-          Yeni Salon Ekle
+        <Link
+          href="/admin/venues/new"
+          className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-md"
+          style={{ background: "#E8C547", color: "#0f0f0f" }}
+        >
+          <Plus className="w-4 h-4" />
+          Yeni Mağaza Ekle
         </Link>
       </div>
 
-      {venues.length === 0 ? (
-        <div className="text-center py-20 rounded-2xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}>
-          <Building2 className="w-16 h-16 mx-auto mb-4" style={{ color: "rgba(201,168,76,0.3)" }} />
-          <p className="font-sans text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Henüz salon eklenmemiş</p>
+      {stores.length === 0 ? (
+        <div
+          className="text-center py-20 rounded-xl"
+          style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
+        >
+          <Store className="w-16 h-16 mx-auto mb-4 text-neutral-700" />
+          <p className="text-sm text-neutral-500">Henüz mağaza eklenmemiş</p>
         </div>
       ) : (
         <div className="grid gap-4">
-          {venues.map((venue) => (
+          {stores.map((store) => (
             <div
-              key={venue.id}
-              className="rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}
+              key={store.id}
+              className="rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <div className="flex-1">
-                <h3 className="font-serif text-xl mb-1" style={{ color: "#E8D5A3" }}>
-                  {venue.venueName}
-                </h3>
-                <p className="font-sans text-sm mb-2" style={{ color: "rgba(201,168,76,0.6)" }}>
-                  {venue.tagline}
-                </p>
-                <div className="flex items-center gap-4 text-xs" style={{ color: "rgba(201,168,76,0.4)" }}>
-                  <span>{venue.city}</span>
-                  <span>•</span>
-                  <span>{venue.capacity.min}-{venue.capacity.max} kişi</span>
-                  <span>•</span>
-                  <span className={venue.isActive ? "text-green-500" : "text-red-500"}>
-                    {venue.isActive ? "Aktif" : "Pasif"}
-                  </span>
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: "rgba(232,197,71,0.1)" }}
+                >
+                  <Store className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-sans font-semibold text-white">{store.storeName}</h3>
+                  <p className="text-sm text-neutral-500">{store.tagline}</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs text-neutral-600">{store.city}</span>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{
+                        background: store.isActive ? "rgba(74,222,128,0.1)" : "rgba(239,68,68,0.1)",
+                        color: store.isActive ? "#4ade80" : "#f87171",
+                      }}
+                    >
+                      {store.isActive ? "Aktif" : "Pasif"}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <Link
-                  href={`/salon/${venue.slug}`}
+                  href={`/salon/${store.slug}`}
                   target="_blank"
-                  className="admin-btn admin-btn-secondary"
+                  className="p-2 rounded-lg border border-neutral-700 text-neutral-400 hover:text-amber-400 hover:border-amber-500/30 transition-colors"
                   title="Önizle"
                 >
                   <Eye className="w-4 h-4" />
                 </Link>
                 <Link
-                  href={`/admin/venues/${venue.id}`}
-                  className="admin-btn admin-btn-secondary"
+                  href={`/admin/venues/${store.id}`}
+                  className="p-2 rounded-lg border border-neutral-700 text-neutral-400 hover:text-amber-400 hover:border-amber-500/30 transition-colors"
                   title="Düzenle"
                 >
                   <Pencil className="w-4 h-4" />
                 </Link>
                 <button
-                  onClick={() => handleDelete(venue.id)}
-                  className="admin-btn admin-btn-secondary text-red-400 hover:text-red-300"
+                  onClick={() => handleDelete(store.id)}
+                  className="p-2 rounded-lg border border-neutral-700 text-neutral-400 hover:text-red-400 hover:border-red-500/30 transition-colors"
                   title="Sil"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -118,13 +134,6 @@ export default function VenuesPage() {
           ))}
         </div>
       )}
-
-      <style jsx global>{`
-        .admin-btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border-radius: 10px; font-size: 12px; font-family: sans-serif; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
-        .admin-btn-primary { background: linear-gradient(135deg, #C9A84C, #E8D5A3); color: #1a0f08; font-weight: 500; }
-        .admin-btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2); color: rgba(201,168,76,0.8); }
-        .admin-btn-secondary:hover { background: rgba(255,255,255,0.1); }
-      `}</style>
     </div>
   );
 }
