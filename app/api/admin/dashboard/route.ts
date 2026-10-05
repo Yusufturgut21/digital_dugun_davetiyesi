@@ -41,6 +41,14 @@ export async function GET() {
 
     return NextResponse.json({
       stats: {
+        totalProducts: totalCouples,
+        activeProducts: activeCouples,
+        totalOrders: totalRsvp,
+        pendingOrders: 0,
+        totalRevenue: 0,
+        totalStores: totalVenues,
+        activeStores: activeVenues,
+        // legacy fields kept for compatibility
         totalCouples,
         totalInvitations: totalCouples,
         activeCouples,
@@ -51,6 +59,15 @@ export async function GET() {
         totalVenues,
         activeVenues,
       },
+      recentOrders: [],
+      topProducts: recentCouples.map((inv) => ({
+        id: inv._id.toString(),
+        name: `${inv.groomName} & ${inv.brideName}`,
+        brand: "—",
+        price: 0,
+        category: "—",
+      })),
+      // legacy
       upcomingWeddings: upcomingWeddings.map((inv) => ({
         id: inv._id.toString(),
         groomName: inv.groomName,

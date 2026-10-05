@@ -5,10 +5,10 @@ import { ShoppingBag, LayoutDashboard, Package, ShoppingCart, Store, ClipboardLi
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/products", label: "Ürünler", icon: Package },
-  { href: "/admin/products/new", label: "+ Yeni Ürün", icon: Package },
-  { href: "/admin/orders", label: "Siparişler", icon: ShoppingCart },
-  { href: "/admin/stores", label: "Mağazalar", icon: Store },
+  { href: "/admin/couples", label: "Ürünler", icon: Package },
+  { href: "/admin/couples/new", label: "+ Yeni Ürün", icon: Package },
+  { href: "/admin/venues", label: "Mağazalar", icon: Store },
+  { href: "/admin/gallery", label: "Vitrin Galerisi", icon: ShoppingCart },
   { href: "/admin/audit-logs", label: "Log Kayıtları", icon: ClipboardList },
 ];
 

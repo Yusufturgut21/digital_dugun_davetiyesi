@@ -6,12 +6,18 @@ import { Package, ShoppingCart, TrendingUp, Store, Plus, ArrowRight } from "luci
 
 interface DashboardData {
   stats: {
-    totalProducts: number;
-    activeProducts: number;
-    totalOrders: number;
-    pendingOrders: number;
-    totalRevenue: number;
-    totalStores: number;
+    totalProducts?: number;
+    activeProducts?: number;
+    totalOrders?: number;
+    pendingOrders?: number;
+    totalRevenue?: number;
+    totalStores?: number;
+    // legacy
+    totalCouples?: number;
+    activeCouples?: number;
+    totalRsvp?: number;
+    totalVenues?: number;
+    activeVenues?: number;
   };
   recentOrders: {
     id: string;
@@ -73,13 +79,13 @@ export default function AdminDashboard() {
   }, []);
 
   // Placeholder data for UI demo
-  const stats = data?.stats ?? {
-    totalProducts: 0,
-    activeProducts: 0,
-    totalOrders: 0,
-    pendingOrders: 0,
-    totalRevenue: 0,
-    totalStores: 0,
+  const stats = {
+    totalProducts: data?.stats?.totalProducts ?? data?.stats?.totalCouples ?? 0,
+    activeProducts: data?.stats?.activeProducts ?? data?.stats?.activeCouples ?? 0,
+    totalOrders: data?.stats?.totalOrders ?? data?.stats?.totalRsvp ?? 0,
+    pendingOrders: data?.stats?.pendingOrders ?? 0,
+    totalRevenue: data?.stats?.totalRevenue ?? 0,
+    totalStores: data?.stats?.totalStores ?? data?.stats?.totalVenues ?? 0,
   };
 
   return (
@@ -88,10 +94,10 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-serif text-3xl font-bold text-white">Dashboard</h2>
-          <p className="font-sans text-sm mt-1 text-neutral-500">StepStyle yönetim özeti</p>
+          <p className="font-sans text-sm mt-1 text-neutral-500">StepStyle yönetim paneli</p>
         </div>
         <Link
-          href="/admin/products/new"
+          href="/admin/couples/new"
           className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-md"
           style={{ background: "#E8C547", color: "#0f0f0f" }}
         >
@@ -124,7 +130,7 @@ export default function AdminDashboard() {
         >
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-sans font-semibold text-white">Son Siparişler</h3>
-            <Link href="/admin/orders" className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
+            <Link href="/admin/couples" className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
               Tümü <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -161,7 +167,7 @@ export default function AdminDashboard() {
         >
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-sans font-semibold text-white">Ürünler</h3>
-            <Link href="/admin/products" className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
+            <Link href="/admin/couples" className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1">
               Tümü <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
