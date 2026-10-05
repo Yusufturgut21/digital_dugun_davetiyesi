@@ -57,17 +57,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Root redirect
+  // Root — her zaman mağazayı göster, oturum durumu fark etmez
   if (pathname === "/") {
-    // Session varsa ve admin ise admin'e yönlendir
-    if (session?.role === "super_admin" && !session.impersonatorId) {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    }
-    // Session varsa ve çift ise panel'e yönlendir
-    if (session?.role === "couple" && session.invitationId) {
-      return NextResponse.redirect(new URL("/panel", req.url));
-    }
-    // Session yoksa veya public landing page için next()
     return NextResponse.next();
   }
 
